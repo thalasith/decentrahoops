@@ -180,13 +180,24 @@ const Content: React.FC = () => {
     }
   };
 
+  interface InputElements extends EventTarget {
+    elements: {
+      fieldset: HTMLFieldSetElement;
+      message: HTMLInputElement;
+      donation: HTMLInputElement;
+      multiple: HTMLInputElement;
+      button: HTMLButtonElement;
+    };
+  }
+
   const handleSubmit = useCallback(
     async (e: SubmitEvent) => {
       e.preventDefault();
 
       // TODO: Fix the typing so that target.elements exists..
-      // @ts-ignore.
-      const { fieldset, message, donation, multiple } = e.target.elements;
+      const { fieldset, message, donation, multiple } = (
+        e.target as InputElements
+      ).elements;
 
       fieldset.disabled = true;
 
