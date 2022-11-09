@@ -7,7 +7,7 @@ import type {
 import type { Transaction } from "@near-wallet-selector/core";
 import type { Account, Message } from "../interfaces";
 import { useWalletSelector } from "../contexts/WalletSelectorContext";
-const CONTRACT_ID = "guest-book.testnet";
+import { CONTRACT_ID } from "../constants";
 import SignIn from "./SignIn";
 import Form from "./Form";
 import Messages from "./Messages";
@@ -194,7 +194,6 @@ const Content: React.FC = () => {
     async (e: SubmitEvent) => {
       e.preventDefault();
 
-      // TODO: Fix the typing so that target.elements exists..
       const { fieldset, message, donation, multiple } = (
         e.target as InputElements
       ).elements;
