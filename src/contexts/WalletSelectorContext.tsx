@@ -34,17 +34,12 @@ interface WalletSelectorContextValue {
   accountId: string | null;
 }
 
-type Props = {
-  children?: React.ReactNode;
-};
-
 const WalletSelectorContext =
   React.createContext<WalletSelectorContextValue | null>(null);
 
-export const WalletSelectorContextProvider: React.FC = ({
-  children,
-}: Props) => {
-  // console.log("typeof", children);
+export const WalletSelectorContextProvider: React.FC<{
+  children: React.ReactNode;
+}> = ({ children }) => {
   const [selector, setSelector] = useState<WalletSelector | null>(null);
   const [modal, setModal] = useState<WalletSelectorModal | null>(null);
   const [accounts, setAccounts] = useState<Array<AccountState>>([]);

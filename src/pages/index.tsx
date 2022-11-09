@@ -19,8 +19,6 @@ const Home: NextPage = () => {
 
       <main className="container mx-auto flex min-h-screen flex-col items-center justify-center p-4">
         <h1>NEAR Guest Book</h1>
-        {/* TO DO - FIX THIS ERROR */}
-        {/* @ts-ignore */}
         <WalletSelectorContextProvider>
           <Content />
         </WalletSelectorContextProvider>
