@@ -9,8 +9,6 @@ import type { Account, Message } from "../interfaces";
 import { useWalletSelector } from "../contexts/WalletSelectorContext";
 import { CONTRACT_ID } from "../constants";
 import SignIn from "./SignIn";
-import Form from "./Form";
-import Messages from "./Messages";
 
 const SUGGESTED_DONATION = "0";
 const BOATLOAD_OF_GAS = utils.format.parseNearAmount("0.00000000003")!;
