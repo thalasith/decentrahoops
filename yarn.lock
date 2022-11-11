@@ -374,6 +374,11 @@
     "@ethersproject/properties" "^5.7.0"
     "@ethersproject/strings" "^5.7.0"
 
+"@formkit/auto-animate@^1.0.0-beta.3":
+  "integrity" "sha512-glsi+ytwQpxT/Ctr9GtcIfVr4dO6mJ04mQbNU8MFSdCdqMopHtyfU5Fib0+9lNFIeR0luY4/0NW95/2R5pKsag=="
+  "resolved" "https://registry.npmjs.org/@formkit/auto-animate/-/auto-animate-1.0.0-beta.3.tgz"
+  "version" "1.0.0-beta.3"
+
 "@hapi/bourne@^2.0.0":
   "integrity" "sha512-i1BpaNDVLJdRBEKeJWkVO6tYX6DMFBuwMhSuWqLsY4ufeTKGVuV5rBsUhxPayXqnnWHgXUAmWK16H/ykO5Wj4Q=="
   "resolved" "https://registry.npmjs.org/@hapi/bourne/-/bourne-2.1.0.tgz"
