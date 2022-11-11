@@ -1,18 +1,72 @@
-import { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { type NextPage } from "next";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { trpc } from "../utils/trpc";
 import Head from "next/head";
+import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
+import { WEEK_DAYS, MONTH_NAMES } from "../constants";
 
 import Header from "../components/Header";
 import { WalletSelectorContextProvider } from "../contexts/WalletSelectorContext";
 
+const dateStringEditor = (date: Date) => {
+  return date.toISOString().slice(0, 10).replace(/-/g, "");
+};
 const Games: NextPage = () => {
   const [shownDay, setShownDay] = useState(new Date());
-  const [shownDates, setShownDates] = useState([]);
-  const [shownGames, setShownGames] = useState([]);
+  const [shownDates, setShownDates] = useState<Date[]>([]);
   const [parent] = useAutoAnimate(/* optional config */);
+
   const hello = trpc.example.hello.useQuery({ text: "from tRPC" });
+
+  const { data: games } = trpc.nbaGames.gamesByDay.useQuery({
+    date: dateStringEditor(shownDay),
+  });
+
+  useEffect(() => {
+    const handleInit = async () => {
+      const dates = nextWeek(shownDay);
+
+      setShownDates(dates);
+    };
+
+    handleInit();
+  }, [shownDay]);
+
+  const previousWeek = (date: Date) => {
+    const newDates = [];
+    for (let i = 0; i < 7; i++) {
+      newDates.push(new Date(date.getTime() - i * 24 * 60 * 60 * 1000));
+    }
+    return newDates.reverse();
+  };
+
+  const nextWeek = (date: Date) => {
+    const nextFiveDays = [];
+    for (let i = 0; i < 7; i++) {
+      nextFiveDays.push(new Date(date.getTime() + i * 24 * 60 * 60 * 1000));
+    }
+    return nextFiveDays;
+  };
+
+  const handleSetDay = async (date: Date) => {
+    setShownDay(date);
+    setShownDates(nextWeek(date));
+  };
+
+  const handlePreviousWeek = () => {
+    const newShownDay = new Date(shownDay.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const newDates = previousWeek(newShownDay);
+    setShownDates(newDates);
+    setShownDay(newShownDay);
+  };
+
+  const handleNextWeek = () => {
+    const newShownDay = new Date(shownDay.getTime() + 7 * 24 * 60 * 60 * 1000);
+    const newDates = nextWeek(newShownDay);
+    setShownDates(newDates);
+    setShownDay(newShownDay);
+  };
 
   return (
     <>
@@ -24,9 +78,7 @@ const Games: NextPage = () => {
       <main className="bg-gray-800 text-white">
         <WalletSelectorContextProvider>
           <Header />
-          <div className="container mx-auto flex min-h-screen flex-col items-center p-4">
-            <h1>Games</h1>
-          </div>
+          <div className="container mx-auto flex min-h-screen flex-col items-center p-4"></div>
         </WalletSelectorContextProvider>
       </main>
     </>

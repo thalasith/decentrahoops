@@ -60,8 +60,6 @@ export default function Header() {
     });
   }, [accountId, getAccount]);
 
-  console.log(account);
-
   return (
     <Popover className="relative border-b border-gray-600">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
