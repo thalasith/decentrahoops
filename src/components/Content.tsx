@@ -49,16 +49,26 @@ const Content: React.FC = () => {
       .query<CodeResult>({
         request_type: "call_function",
         account_id: CONTRACT_ID,
-        method_name: "getMessages",
+        method_name: "get_all_bets",
         args_base64: "",
         finality: "optimistic",
       })
       .then((res) => JSON.parse(Buffer.from(res.result).toString()));
   }, [selector]);
 
+  //Sample way
+  const getData = async () => {
+    const test = await fetch(
+      "http://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=20221110"
+    ).then((res) => res.json());
+    return test;
+  };
+
   useEffect(() => {
-    // TODO: don't just fetch once; subscribe!
     getMessages().then(setMessages);
+    const test = getData().then((res) => {
+      console.log(res);
+    });
   }, []);
 
   useEffect(() => {
@@ -102,6 +112,7 @@ const Content: React.FC = () => {
     alert("Switched account to " + nextAccountId);
   };
 
+  // EXAMPLE
   const addMessages = useCallback(
     async (message: string, donation: string, multiple: boolean) => {
       const { contract } = selector.store.getState();
@@ -242,23 +253,7 @@ const Content: React.FC = () => {
     );
   }
 
-  return (
-    <Fragment>
-      <div>
-        <button onClick={handleSignOut}>Log out</button>
-        <button onClick={handleSwitchWallet}>Switch Wallet</button>
-        <button onClick={handleVerifyOwner}>Verify Owner</button>
-        {accounts.length > 1 && (
-          <button onClick={handleSwitchAccount}>Switch Account</button>
-        )}
-      </div>
-      <Form
-        account={account}
-        onSubmit={(e: any) => handleSubmit(e as unknown as SubmitEvent)}
-      />
-      <Messages messages={messages} />
-    </Fragment>
-  );
+  return <Fragment>Hi there</Fragment>;
 };
 
 export default Content;

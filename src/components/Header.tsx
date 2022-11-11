@@ -60,22 +60,24 @@ export default function Header() {
     });
   }, [accountId, getAccount]);
 
+  console.log(account);
+
   return (
-    <Popover className="relative bg-white">
+    <Popover className="relative border-b border-gray-600">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
-        <div className="flex items-center justify-between border-b-2 border-gray-100 py-6 md:justify-start md:space-x-10">
+        <div className="flex items-center justify-between  py-6 md:justify-start md:space-x-10">
           <div className="flex justify-start lg:w-0 lg:flex-1">
             <a href="#">
               <span className="sr-only">Your Company</span>
               <img
                 className="h-8 w-auto sm:h-10"
-                src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
+                src="https://tailwindui.com/img/logos/mark.svg?color=orange&shade=500"
                 alt=""
               />
             </a>
           </div>
           <div className="-my-2 -mr-2 md:hidden">
-            <Popover.Button className="inline-flex items-center justify-center rounded-md bg-white p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500">
+            <Popover.Button className="inline-flex items-center justify-center rounded-md bg-white p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-orange-500">
               <span className="sr-only">Open menu</span>
               <Bars3Icon className="h-6 w-6" aria-hidden="true" />
             </Popover.Button>
@@ -84,14 +86,17 @@ export default function Header() {
           <div className="hidden items-center justify-end md:flex md:flex-1 lg:w-0">
             {account ? (
               <div>
-                <button className->{account.account_id}</button>
+                Your Balance: {utils.format.formatNearAmount(account.amount, 2)}{" "}
+                N
                 <HeaderButton onClick={handleSwitchWallet}>
                   Switch Wallet
                 </HeaderButton>
-                <HeaderButton onClick={handleSignOut}>Sign Out</HeaderButton>
+                <HeaderButton onClick={handleSignOut}>
+                  Disconnect Wallet
+                </HeaderButton>
               </div>
             ) : (
-              <HeaderButton onClick={handleSignIn}>Sign up</HeaderButton>
+              <HeaderButton onClick={handleSignIn}>Connect Wallet</HeaderButton>
             )}
           </div>
         </div>
@@ -144,7 +149,7 @@ const HeaderButton: React.FC<ButtonProps> = ({ onClick, children }) => {
   return (
     <button
       onClick={onClick}
-      className="mx-1 inline-flex items-center justify-center whitespace-nowrap rounded-md border border-transparent bg-indigo-600 px-1 py-1 text-base font-medium text-white shadow-sm hover:bg-indigo-700"
+      className="mx-1 inline-flex items-center justify-center whitespace-nowrap rounded-md border border-transparent bg-orange-600 px-1 py-1 text-base font-medium text-white shadow-sm hover:bg-orange-400"
     >
       {children}
     </button>
