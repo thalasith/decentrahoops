@@ -15,7 +15,7 @@ const Home: NextPage = () => {
     gameId: gameId,
   });
 
-  console.log(boxscore?.data);
+  // TODO: Mobile optimize
   return (
     <>
       <Head>
@@ -75,8 +75,10 @@ const Home: NextPage = () => {
                           {boxscore?.data.competitors[1].team.abbreviation}
                         </td>
                         {boxscore?.data.competitors[1].linescores.map(
-                          (line: { displayValue: string }) => (
-                            <td className="px-2">{line.displayValue}</td>
+                          (line: { displayValue: string }, i: number) => (
+                            <td key={i} className="px-2">
+                              {line.displayValue}
+                            </td>
                           )
                         )}
                         <td className="px-2 font-semibold">
@@ -88,8 +90,10 @@ const Home: NextPage = () => {
                           {boxscore?.data.competitors[0].team.abbreviation}
                         </td>
                         {boxscore?.data.competitors[0].linescores.map(
-                          (line: { displayValue: string }) => (
-                            <td className="px-2">{line.displayValue}</td>
+                          (line: { displayValue: string }, i: number) => (
+                            <td key={i} className="px-2">
+                              {line.displayValue}
+                            </td>
                           )
                         )}
                         <td className="px-2 font-semibold">
