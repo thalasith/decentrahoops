@@ -10,10 +10,13 @@ import Header from "../components/Header";
 import { WalletSelectorContextProvider } from "../contexts/WalletSelectorContext";
 
 const dateStringEditor = (date: Date) => {
-  const day = date.getDate().toLocaleString();
+  const day =
+    date.getDate() < 10
+      ? "0" + date.getDate().toLocaleString()
+      : date.getDate().toLocaleString();
   const month = (date.getMonth() + 1).toLocaleString();
   const year = date.getFullYear().toLocaleString().replace(/,/g, "");
-  console.log(year + month + day);
+
   return year + month + day;
 };
 const Games: NextPage = () => {
@@ -25,6 +28,8 @@ const Games: NextPage = () => {
     date: dateStringEditor(shownDay),
   });
 
+  console.log(shownDay);
+
   useEffect(() => {
     const handleInit = async () => {
       const dates = nextWeek(shownDay);
@@ -33,7 +38,7 @@ const Games: NextPage = () => {
     };
 
     handleInit();
-  }, [shownDay]);
+  }, []);
 
   const previousWeek = (date: Date) => {
     const newDates = [];
@@ -53,7 +58,7 @@ const Games: NextPage = () => {
 
   const handleSetDay = async (date: Date) => {
     setShownDay(date);
-    setShownDates(nextWeek(date));
+    // setShownDates(nextWeek(date));
   };
 
   const handlePreviousWeek = () => {
@@ -91,8 +96,8 @@ const Games: NextPage = () => {
                     key={date.getDay()}
                     className={
                       date.getDay() === shownDay.getDay()
-                        ? "float-left mx-2 w-4 rounded bg-orange-200 px-4 font-bold text-slate-600 lg:w-12"
-                        : "float-left mx-2 w-4 px-4 hover:rounded hover:bg-orange-200 hover:text-slate-600 lg:w-12 "
+                        ? "float-left mx-2 w-4 rounded bg-orange-200 px-4 font-bold text-slate-600 transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-105 hover:shadow-md lg:mx-4 lg:w-12 "
+                        : "float-left mx-2 w-4 rounded px-4 transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-105 hover:bg-orange-200 hover:text-slate-600 hover:shadow-md lg:mx-4 lg:w-12 "
                     }
                     onClick={() => handleSetDay(date)}
                   >
@@ -130,33 +135,33 @@ const GameCard = ({ game }: any) => {
   const homeTeam = game.competitions[0].competitors[0];
   const awayTeam = game.competitions[0].competitors[1];
 
-  // console.log(game);
-
-  const scheduledGame = (
-    <div className="ml-4">{game.status.type.shortDetail.slice(8)}</div>
-  );
-
-  const finalScore = (
-    <div>
-      <div className="ml-4 h-10">{awayTeam.score}</div>
-      <div className="ml-4 ">{homeTeam.score}</div>
-    </div>
-  );
   return (
-    <div className="flex-col-2 m-2 flex w-56 items-center justify-between rounded bg-orange-200 p-2 text-slate-600">
-      <div className="">
+    <div className="grid-row-2 m-2 grid items-center justify-center rounded bg-orange-200 p-2 text-slate-600 transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-105 hover:shadow-md lg:mx-4">
+      <div className="flex justify-center font-bold">
+        {game.status.type.name === "STATUS_SCHEDULED"
+          ? "Tip Off @ " + game.status.type.shortDetail.slice(8)
+          : game.status.type.detail}
+      </div>
+      <div className="grid-row-2 grid w-48 grid-cols-2 items-center justify-between ">
         <div className="flex items-center">
           <img src={awayTeam.team.logo} className="h-10 w-10" />
           {awayTeam.team.abbreviation}
+        </div>
+        <div className="flex items-center justify-end pr-2">
+          {game.status.type.name === "STATUS_SCHEDULED"
+            ? awayTeam.records[0].summary
+            : awayTeam.score}
         </div>
         <div className="flex items-center">
           <img src={homeTeam.team.logo} className="h-10 w-10" />
           {homeTeam.team.abbreviation}
         </div>
+        <div className="flex items-center justify-end pr-2">
+          {game.status.type.name === "STATUS_SCHEDULED"
+            ? homeTeam.records[0].summary
+            : homeTeam.score}
+        </div>
       </div>
-      {game.status.type.name === "STATUS_SCHEDULED"
-        ? scheduledGame
-        : finalScore}
     </div>
   );
 };
