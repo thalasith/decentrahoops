@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { type NextPage } from "next";
+import Link from "next/link";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { trpc } from "../utils/trpc";
 import Head from "next/head";
@@ -136,7 +137,10 @@ const GameCard = ({ game }: any) => {
   const awayTeam = game.competitions[0].competitors[1];
 
   return (
-    <div className="grid-row-2 m-2 grid items-center justify-center rounded bg-orange-200 p-2 text-slate-600 transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-105 hover:shadow-md lg:mx-4">
+    <Link
+      href={`/games/${game.id}`}
+      className="grid-row-2 m-2 grid items-center justify-center rounded bg-orange-200 p-2 text-slate-600 transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-105 hover:shadow-md lg:mx-4"
+    >
       <div className="flex justify-center font-bold">
         {game.status.type.name === "STATUS_SCHEDULED"
           ? "Tip Off @ " + game.status.type.shortDetail.slice(8)
@@ -162,6 +166,6 @@ const GameCard = ({ game }: any) => {
             : homeTeam.score}
         </div>
       </div>
-    </div>
+    </Link>
   );
 };

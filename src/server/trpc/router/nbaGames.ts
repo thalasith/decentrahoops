@@ -11,7 +11,13 @@ export const nbaGamesRouter = router({
       ).then((res) => res.json());
       return games.events;
     }),
-  getAll: publicProcedure.query(({ ctx }) => {
-    return ctx.prisma.example.findMany();
-  }),
+  gameById: publicProcedure
+    .input(z.object({ gameId: z.string().nullish() }).nullish())
+    .query(async ({ input }) => {
+      console.log(input);
+      const boxscore = await fetch(
+        `https://site.api.espn.com/apis/site/v2/sports/basketball/nba/summary?event=${input?.gameId}`
+      ).then((res) => res.json());
+      return boxscore.boxscore.header;
+    }),
 });
