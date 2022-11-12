@@ -10,7 +10,11 @@ import Header from "../components/Header";
 import { WalletSelectorContextProvider } from "../contexts/WalletSelectorContext";
 
 const dateStringEditor = (date: Date) => {
-  return date.toISOString().slice(0, 10).replace(/-/g, "");
+  const day = date.getDate().toLocaleString();
+  const month = (date.getMonth() + 1).toLocaleString();
+  const year = date.getFullYear().toLocaleString().replace(/,/g, "");
+  console.log(year + month + day);
+  return year + month + day;
 };
 const Games: NextPage = () => {
   const [shownDay, setShownDay] = useState(new Date());
@@ -87,8 +91,8 @@ const Games: NextPage = () => {
                     key={date.getDay()}
                     className={
                       date.getDay() === shownDay.getDay()
-                        ? "float-left mx-4 w-4 rounded bg-orange-200 font-bold text-slate-600 lg:w-12"
-                        : "float-left mx-4 w-4 hover:rounded hover:bg-orange-200 hover:text-slate-600 lg:w-12 "
+                        ? "float-left mx-2 w-4 rounded bg-orange-200 px-4 font-bold text-slate-600 lg:w-12"
+                        : "float-left mx-2 w-4 px-4 hover:rounded hover:bg-orange-200 hover:text-slate-600 lg:w-12 "
                     }
                     onClick={() => handleSetDay(date)}
                   >
@@ -106,7 +110,7 @@ const Games: NextPage = () => {
                 <ChevronRightIcon onClick={handleNextWeek} />
               </button>
             </div>
-            <div className="grid grid-cols-4">
+            <div className="grid lg:grid-cols-4">
               {games?.map((game: any) => {
                 return <GameCard key={game.id} game={game} />;
               })}
@@ -126,7 +130,7 @@ const GameCard = ({ game }: any) => {
   const homeTeam = game.competitions[0].competitors[0];
   const awayTeam = game.competitions[0].competitors[1];
 
-  console.log(game);
+  // console.log(game);
 
   const scheduledGame = (
     <div className="ml-4">{game.status.type.shortDetail.slice(8)}</div>
