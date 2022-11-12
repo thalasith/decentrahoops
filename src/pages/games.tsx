@@ -29,8 +29,6 @@ const Games: NextPage = () => {
     date: dateStringEditor(shownDay),
   });
 
-  console.log(shownDay);
-
   useEffect(() => {
     const handleInit = async () => {
       const dates = nextWeek(shownDay);

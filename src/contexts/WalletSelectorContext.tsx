@@ -43,6 +43,7 @@ export const WalletSelectorContextProvider: React.FC<{
   const [selector, setSelector] = useState<WalletSelector | null>(null);
   const [modal, setModal] = useState<WalletSelectorModal | null>(null);
   const [accounts, setAccounts] = useState<Array<AccountState>>([]);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const init = useCallback(async () => {
     const _selector = await setupWalletSelector({
