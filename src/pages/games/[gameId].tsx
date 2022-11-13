@@ -1,4 +1,5 @@
 import { type NextPage } from "next";
+import { useState, useEffect, useCallback } from "react";
 import Head from "next/head";
 import Header from "../../components/Header";
 import { WalletSelectorContextProvider } from "../../contexts/WalletSelectorContext";
@@ -7,6 +8,14 @@ import { useRouter } from "next/router";
 import { RiArrowLeftSFill, RiArrowRightSFill } from "react-icons/ri";
 import { useWindowWidth } from "@react-hook/window-size";
 import Link from "next/link";
+
+import { useWalletSelector } from "../../contexts/WalletSelectorContext";
+import { providers, utils } from "near-api-js";
+import type {
+  AccountView,
+  CodeResult,
+} from "near-api-js/lib/providers/provider";
+import { CONTRACT_ID } from "../../constants";
 import { RiArrowGoBackFill } from "react-icons/ri";
 
 const Home: NextPage = () => {
@@ -19,8 +28,8 @@ const Home: NextPage = () => {
   });
 
   const scoresNotStarted = ["0", "0", "0", "0", "0"];
-  console.log(boxscore);
-  // TODO: Mobile optimize
+
+  // TODO: fix up game data when game is live
   return (
     <>
       <Head>
@@ -39,7 +48,7 @@ const Home: NextPage = () => {
               </button>
             </Link>
             {boxscore.isSuccess && (
-              <div className="mx-auto flex w-full flex-col items-center justify-center rounded bg-orange-200 text-slate-700 lg:w-10/12">
+              <div className="mx-auto flex w-10/12 flex-col items-center justify-center rounded bg-orange-200 text-slate-700">
                 <span> {boxscore?.data.status.type.detail}</span>
                 <div className="flex w-full flex-row">
                   <div className=" flex w-1/2 items-center justify-end lg:mr-4 lg:w-2/5">
@@ -176,6 +185,12 @@ const Home: NextPage = () => {
                 </div>
               </div>
             )}
+            {boxscore?.isSuccess && (
+              <Bets
+                homeTeam={boxscore?.data.competitors[0].team.abbreviation}
+                awayTeam={boxscore?.data.competitors[1].team.abbreviation}
+              />
+            )}
           </div>
         </WalletSelectorContextProvider>
       </main>
@@ -184,3 +199,73 @@ const Home: NextPage = () => {
 };
 
 export default Home;
+
+const Bets = (teams: { homeTeam: string; awayTeam: string }) => {
+  const { selector } = useWalletSelector();
+  const [bets, setBets] = useState([]);
+  const getBets = useCallback(() => {
+    const { network } = selector.options;
+    const provider = new providers.JsonRpcProvider({ url: network.nodeUrl });
+
+    return provider
+      .query<CodeResult>({
+        request_type: "call_function",
+        account_id: CONTRACT_ID,
+        method_name: "get_all_bets",
+        args_base64: "",
+        finality: "optimistic",
+      })
+      .then((res) => JSON.parse(Buffer.from(res.result).toString()));
+  }, [selector]);
+
+  useEffect(() => {
+    getBets().then(setBets);
+  }, []);
+
+  bets.map((bet: any) => console.log(bet));
+  return (
+    <div className="grid-row-3 mx-auto mt-4 grid w-10/12 items-center justify-center">
+      {bets.map((bet: any) => (
+        <div className="flex w-full flex-col items-center rounded bg-orange-200 py-2 px-4 text-slate-600">
+          <p>
+            {teams.awayTeam} vs {teams.homeTeam}
+          </p>
+          <img
+            className="h-12 w-12 lg:h-24 lg:w-24"
+            src={`https://a.espncdn.com/i/teamlogos/nba/500/${bet.better_team}.png`}
+          />
+          <div className="flex w-full flex-row items-center justify-between border-t border-black">
+            <div className="flex flex-col justify-start">
+              <p>Odds</p>
+              <p>-100 on {bet.better_team}</p>
+            </div>
+            <div className="flex flex-col justify-end">
+              <p className="text-end">Total Pot</p>
+              <p className="text-end">
+                {utils.format.formatNearAmount(
+                  (
+                    parseInt(bet.better_deposit) +
+                    parseInt(bet.market_maker_deposit)
+                  ).toLocaleString("en-US", {
+                    useGrouping: false,
+                  }),
+                  2
+                )}{" "}
+                N
+              </p>
+            </div>
+          </div>
+          <div className="mt-4 flex w-full flex-row items-center justify-between">
+            <p>
+              You pay <span className="font-extrabold">5 N</span>
+            </p>
+            <button className="mx-1 inline-flex items-center justify-center whitespace-nowrap rounded-md border border-transparent bg-orange-600 px-1 py-1 text-base font-medium text-white shadow-sm hover:bg-orange-400">
+              {" "}
+              Accept Bet
+            </button>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
