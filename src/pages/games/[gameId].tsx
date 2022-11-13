@@ -225,8 +225,11 @@ const Bets = (teams: { homeTeam: string; awayTeam: string }) => {
   bets.map((bet: any) => console.log(bet));
   return (
     <div className="grid-row-3 mx-auto mt-4 grid w-10/12 items-center justify-center">
-      {bets.map((bet: any) => (
-        <div className="flex w-full flex-col items-center rounded bg-orange-200 py-2 px-4 text-slate-600">
+      {bets.map((bet: any, key: number) => (
+        <div
+          key={key}
+          className="flex w-full flex-col items-center rounded bg-orange-200 py-2 px-4 text-slate-600"
+        >
           <p>
             {teams.awayTeam} vs {teams.homeTeam}
           </p>
