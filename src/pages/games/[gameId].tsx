@@ -48,7 +48,7 @@ const Home: NextPage = () => {
           <Header />
           <div className="container mx-auto flex min-h-screen flex-col">
             <Link href="/games" className="mx-auto my-4 w-full lg:w-10/12">
-              <PrimaryButton onClick={() => {}}>
+              <PrimaryButton>
                 <RiArrowGoBackFill className="my-1" />
                 Back to all Games
               </PrimaryButton>
