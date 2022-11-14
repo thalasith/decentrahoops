@@ -13,6 +13,11 @@ import GameBets from "../../components/GameBets";
 import PrimaryButton from "../../components/PrimaryButton";
 
 import { Dialog, Transition } from "@headlessui/react";
+import { XMarkIcon } from "@heroicons/react/24/outline";
+import {
+  americanOddsCalculator,
+  payOutFromAmericanOdds,
+} from "../../utils/formatting";
 
 import { useWalletSelector } from "../../contexts/WalletSelectorContext";
 import { providers, utils } from "near-api-js";
@@ -196,10 +201,14 @@ const Home: NextPage = () => {
                 Add a bet
               </PrimaryButton>
             </div>
-            <BetModal
-              isModalOpen={isModalOpen}
-              setIsModalOpen={setIsModalOpen}
-            />
+            {boxscore?.isSuccess && (
+              <BetModal
+                isModalOpen={isModalOpen}
+                setIsModalOpen={setIsModalOpen}
+                homeTeam={boxscore?.data.competitors[0].team.abbreviation}
+                awayTeam={boxscore?.data.competitors[1].team.abbreviation}
+              />
+            )}
             {boxscore?.isSuccess && (
               <GameBets
                 homeTeam={boxscore?.data.competitors[0].team.abbreviation}
@@ -216,16 +225,138 @@ const Home: NextPage = () => {
 
 export default Home;
 
-const BetModal = (modalData: { isModalOpen: boolean; setIsModalOpen: any }) => {
-  // <div
-  //       className={`fixed inset-0 flex items-center justify-center bg-black bg-opacity-25 backdrop-blur-sm ${
-  //         modalData.isModalOpen ? "flex" : "hidden"
-  //       }`}
-  //     >
-  //       <button onClick={() => modalData.setIsModalOpen(false)}>
-  //         Click me!
-  //       </button>
-  //     </div>
+const BetModal = (modalData: {
+  isModalOpen: boolean;
+  setIsModalOpen: any;
+  homeTeam: string;
+  awayTeam: string;
+}) => {
+  const [marketMakerTeam, setMarketMakerTeam] = useState("");
+  const [marketMakerDeposit, setMarketMakerDeposit] = useState(0);
+  const [americanOdds, setAmericanOdds] = useState(0);
+  const [betterTeam, setBetterTeam] = useState("");
+  const [phase, setPhase] = useState(1);
+  const [validationErrors, setValidationErrors] = useState({
+    noTeamSelected: "",
+    negativeBettingAmount: "",
+    wrongBettingOdds: "",
+  });
+
+  const handleTeamSelection = (team: string) => {
+    if (team === modalData.homeTeam) {
+      setMarketMakerTeam(modalData.homeTeam);
+      setBetterTeam(modalData.awayTeam);
+    } else {
+      setMarketMakerTeam(modalData.awayTeam);
+      setBetterTeam(modalData.homeTeam);
+    }
+  };
+  const handleOdds = (value: number) => {
+    if (Math.abs(value) >= 100) {
+      setAmericanOdds(value);
+      setValidationErrors({
+        ...validationErrors,
+        wrongBettingOdds: "",
+      });
+    } else {
+      setValidationErrors({
+        ...validationErrors,
+        wrongBettingOdds: "Please put in valid odds (between -100 and 100)",
+      });
+    }
+  };
+  const handleMarketMakerDeposit = (value: number) => {
+    if (value > 0) {
+      setMarketMakerDeposit(value);
+      setValidationErrors({
+        ...validationErrors,
+        negativeBettingAmount: "",
+      });
+    } else {
+      setValidationErrors({
+        ...validationErrors,
+        negativeBettingAmount: "Please input a valid positive amount",
+      });
+    }
+  };
+
+  const FirstPhase = () => (
+    <div className="mt-2 flex flex-row items-center justify-center">
+      <button
+        className={`rounded-md p-2 hover:bg-orange-200 ${
+          marketMakerTeam === modalData.awayTeam && " bg-orange-200"
+        }`}
+        onClick={() => handleTeamSelection(modalData.awayTeam)}
+      >
+        <img
+          className="h-36 w-36"
+          src={`https://a.espncdn.com/combiner/i?img=/i/teamlogos/nba/500/${modalData.awayTeam}.png`}
+        />
+      </button>
+      <p className="mx-8 text-center text-4xl text-gray-500">vs</p>
+      <button
+        className={`rounded-md p-2 hover:bg-orange-200 ${
+          marketMakerTeam === modalData.homeTeam && " bg-orange-200"
+        }`}
+        onClick={() => handleTeamSelection(modalData.homeTeam)}
+      >
+        <img
+          className="h-36 w-36"
+          src={`https://a.espncdn.com/combiner/i?img=/i/teamlogos/nba/500/${modalData.homeTeam}.png`}
+        />
+      </button>
+    </div>
+  );
+
+  const SecondPhase = () => (
+    <div className="flex flex-row items-center justify-center">
+      <div className="py-2">
+        <label
+          htmlFor="marketMakerTeam"
+          className="block text-sm font-medium text-gray-700"
+        >
+          Amount you are betting on {marketMakerTeam}
+        </label>
+        <div className="py-2">
+          <input
+            type="number"
+            name="marketMakerDeposit"
+            id="marketMakerDeposit"
+            className="block w-full rounded-md border border-solid border-gray-300  py-2 pl-4 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            placeholder="Amount you will bet"
+            onChange={(e) => handleMarketMakerDeposit(parseInt(e.target.value))}
+          />
+        </div>
+        <label
+          htmlFor="marketMakerTeam"
+          className="block text-sm font-medium text-gray-700"
+        >
+          Your betting odds on {marketMakerTeam}
+        </label>
+        <div className="py-2">
+          <input
+            className="block w-full rounded-md border border-solid border-gray-300  py-2 pl-4 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            type="number"
+            name="marketMakerDeposit"
+            onChange={(e) => handleOdds(parseInt(e.target.value))}
+            placeholder="Your Bettings Odds"
+          />
+          <div className="text-xs italic text-red-500">
+            {validationErrors.wrongBettingOdds
+              ? validationErrors.wrongBettingOdds
+              : " "}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const ThirdPhase = () => (
+    <div className="mt-2 flex flex-row items-center justify-center">
+      ThirdPhase
+    </div>
+  );
+
   return (
     <Transition appear show={modalData.isModalOpen} as={Fragment}>
       <Dialog
@@ -256,28 +387,35 @@ const BetModal = (modalData: { isModalOpen: boolean; setIsModalOpen: any }) => {
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+              <Dialog.Panel className="w-11/12 transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all lg:w-1/3">
                 <Dialog.Title
                   as="h3"
-                  className="text-lg font-medium leading-6 text-gray-900"
+                  className="flex justify-between text-lg font-medium leading-6 text-gray-900"
                 >
-                  Payment successful
-                </Dialog.Title>
-                <div className="mt-2">
-                  <p className="text-sm text-gray-500">
-                    Your payment has been successfully submitted. We’ve sent you
-                    an email with all of the details of your order.
-                  </p>
-                </div>
-
-                <div className="mt-4">
-                  <button
-                    type="button"
-                    className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                    onClick={() => modalData.setIsModalOpen(false)}
-                  >
-                    Got it, thanks!
+                  Make a Bet: Step {phase} of 3
+                  <button onClick={() => modalData.setIsModalOpen(false)}>
+                    <XMarkIcon className="h-6 w-6" />
                   </button>
+                </Dialog.Title>
+
+                {phase === 1 && <FirstPhase />}
+                {phase === 2 && <SecondPhase />}
+                {phase === 3 && <ThirdPhase />}
+
+                <div
+                  className={`mt-4 flex w-full ${
+                    phase === 1 ? "justify-end" : "justify-between"
+                  }`}
+                >
+                  <div className={phase === 1 ? "hidden" : "flex"}>
+                    <PrimaryButton onClick={() => setPhase(phase - 1)}>
+                      Previous
+                    </PrimaryButton>
+                  </div>
+
+                  <PrimaryButton onClick={() => setPhase(phase + 1)}>
+                    Next
+                  </PrimaryButton>
                 </div>
               </Dialog.Panel>
             </Transition.Child>

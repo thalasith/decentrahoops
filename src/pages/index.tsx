@@ -3,7 +3,6 @@ import Head from "next/head";
 import Header from "../components/Header";
 import { WalletSelectorContextProvider } from "../contexts/WalletSelectorContext";
 import Content from "../components/Content";
-import { trpc } from "../utils/trpc";
 
 const Home: NextPage = () => {
   return (
