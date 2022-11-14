@@ -8,7 +8,6 @@ import type { Transaction } from "@near-wallet-selector/core";
 import type { Account, Message } from "../interfaces";
 import { useWalletSelector } from "../contexts/WalletSelectorContext";
 import { CONTRACT_ID } from "../constants";
-import SignIn from "./SignIn";
 
 const SUGGESTED_DONATION = "0";
 const BOATLOAD_OF_GAS = utils.format.parseNearAmount("0.00000000003")!;
@@ -246,7 +245,6 @@ const Content: React.FC = () => {
         <div>
           <button onClick={handleSignIn}>Log in</button>
         </div>
-        <SignIn />
       </Fragment>
     );
   }

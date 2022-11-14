@@ -6,6 +6,7 @@ import { useWalletSelector } from "../contexts/WalletSelectorContext";
 import { Popover, Transition } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { GiBasketballBall } from "react-icons/gi";
+import PrimaryButton from "./PrimaryButton";
 
 export default function Header() {
   const { selector, modal, accounts, accountId } = useWalletSelector();
@@ -84,15 +85,17 @@ export default function Header() {
               <div>
                 Your Balance: {utils.format.formatNearAmount(account.amount, 2)}{" "}
                 N
-                <HeaderButton onClick={handleSwitchWallet}>
+                <PrimaryButton onClick={handleSwitchWallet}>
                   Switch Wallet
-                </HeaderButton>
-                <HeaderButton onClick={handleSignOut}>
+                </PrimaryButton>
+                <PrimaryButton onClick={handleSignOut}>
                   Disconnect Wallet
-                </HeaderButton>
+                </PrimaryButton>
               </div>
             ) : (
-              <HeaderButton onClick={handleSignIn}>Connect Wallet</HeaderButton>
+              <PrimaryButton onClick={handleSignIn}>
+                Connect Wallet
+              </PrimaryButton>
             )}
           </div>
         </div>
@@ -136,19 +139,3 @@ export default function Header() {
     </Popover>
   );
 }
-
-interface ButtonProps {
-  children?: React.ReactNode;
-  onClick: () => void;
-}
-
-const HeaderButton: React.FC<ButtonProps> = ({ onClick, children }) => {
-  return (
-    <button
-      onClick={onClick}
-      className="mx-1 inline-flex items-center justify-center whitespace-nowrap rounded-md border border-transparent bg-orange-600 px-1 py-1 text-base font-medium text-white shadow-sm hover:bg-orange-400"
-    >
-      {children}
-    </button>
-  );
-};

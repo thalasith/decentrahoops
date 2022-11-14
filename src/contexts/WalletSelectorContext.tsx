@@ -18,7 +18,7 @@ import { setupWalletConnect } from "@near-wallet-selector/wallet-connect";
 import { setupCoin98Wallet } from "@near-wallet-selector/coin98-wallet";
 import { setupNeth } from "@near-wallet-selector/neth";
 import { setupOptoWallet } from "@near-wallet-selector/opto-wallet";
-const CONTRACT_ID = "guest-book.testnet";
+import { CONTRACT_ID } from "../constants";
 
 declare global {
   interface Window {

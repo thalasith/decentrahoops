@@ -1,5 +1,5 @@
 import { type NextPage } from "next";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, Fragment } from "react";
 import Head from "next/head";
 import Header from "../../components/Header";
 import { WalletSelectorContextProvider } from "../../contexts/WalletSelectorContext";
@@ -8,6 +8,11 @@ import { useRouter } from "next/router";
 import { RiArrowLeftSFill, RiArrowRightSFill } from "react-icons/ri";
 import { useWindowWidth } from "@react-hook/window-size";
 import Link from "next/link";
+import { RiArrowGoBackFill } from "react-icons/ri";
+import GameBets from "../../components/GameBets";
+import PrimaryButton from "../../components/PrimaryButton";
+
+import { Dialog, Transition } from "@headlessui/react";
 
 import { useWalletSelector } from "../../contexts/WalletSelectorContext";
 import { providers, utils } from "near-api-js";
@@ -16,12 +21,13 @@ import type {
   CodeResult,
 } from "near-api-js/lib/providers/provider";
 import { CONTRACT_ID } from "../../constants";
-import { RiArrowGoBackFill } from "react-icons/ri";
 
 const Home: NextPage = () => {
   const router = useRouter();
   const { gameId } = router.query as { gameId: string };
   const windowWidth = useWindowWidth();
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const boxscore = trpc.nbaGames.gameById.useQuery({
     gameId: gameId,
@@ -42,10 +48,10 @@ const Home: NextPage = () => {
           <Header />
           <div className="container mx-auto flex min-h-screen flex-col">
             <Link href="/games" className="mx-auto my-4 w-full lg:w-10/12">
-              <button className="mx-1 inline-flex items-center justify-center whitespace-nowrap rounded-md border border-transparent bg-orange-600 px-1 py-1 text-base font-medium text-white shadow-sm hover:bg-orange-400">
+              <PrimaryButton onClick={() => {}}>
                 <RiArrowGoBackFill className="my-1" />
                 Back to all Games
-              </button>
+              </PrimaryButton>
             </Link>
             {boxscore.isSuccess && (
               <div className="mx-auto flex w-10/12 flex-col items-center justify-center rounded bg-orange-200 text-slate-700">
@@ -185,10 +191,20 @@ const Home: NextPage = () => {
                 </div>
               </div>
             )}
+            <div className="mt-4 flex justify-center">
+              <PrimaryButton onClick={() => setIsModalOpen(true)}>
+                Add a bet
+              </PrimaryButton>
+            </div>
+            <BetModal
+              isModalOpen={isModalOpen}
+              setIsModalOpen={setIsModalOpen}
+            />
             {boxscore?.isSuccess && (
-              <Bets
+              <GameBets
                 homeTeam={boxscore?.data.competitors[0].team.abbreviation}
                 awayTeam={boxscore?.data.competitors[1].team.abbreviation}
+                gameId={gameId}
               />
             )}
           </div>
@@ -200,75 +216,74 @@ const Home: NextPage = () => {
 
 export default Home;
 
-const Bets = (teams: { homeTeam: string; awayTeam: string }) => {
-  const { selector } = useWalletSelector();
-  const [bets, setBets] = useState([]);
-  const getBets = useCallback(() => {
-    const { network } = selector.options;
-    const provider = new providers.JsonRpcProvider({ url: network.nodeUrl });
-
-    return provider
-      .query<CodeResult>({
-        request_type: "call_function",
-        account_id: CONTRACT_ID,
-        method_name: "get_all_bets",
-        args_base64: "",
-        finality: "optimistic",
-      })
-      .then((res) => JSON.parse(Buffer.from(res.result).toString()));
-  }, [selector]);
-
-  useEffect(() => {
-    getBets().then(setBets);
-  }, []);
-
-  bets.map((bet: any) => console.log(bet));
+const BetModal = (modalData: { isModalOpen: boolean; setIsModalOpen: any }) => {
+  // <div
+  //       className={`fixed inset-0 flex items-center justify-center bg-black bg-opacity-25 backdrop-blur-sm ${
+  //         modalData.isModalOpen ? "flex" : "hidden"
+  //       }`}
+  //     >
+  //       <button onClick={() => modalData.setIsModalOpen(false)}>
+  //         Click me!
+  //       </button>
+  //     </div>
   return (
-    <div className="grid-row-3 mx-auto mt-4 grid w-10/12 items-center justify-center">
-      {bets.map((bet: any, key: number) => (
-        <div
-          key={key}
-          className="flex w-full flex-col items-center rounded bg-orange-200 py-2 px-4 text-slate-600"
+    <Transition appear show={modalData.isModalOpen} as={Fragment}>
+      <Dialog
+        as="div"
+        className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-25 backdrop-blur-sm"
+        onClose={() => modalData.setIsModalOpen(false)}
+      >
+        <Transition.Child
+          as={Fragment}
+          enter="ease-out duration-300"
+          enterFrom="opacity-0"
+          enterTo="opacity-100"
+          leave="ease-in duration-200"
+          leaveFrom="opacity-100"
+          leaveTo="opacity-0"
         >
-          <p>
-            {teams.awayTeam} vs {teams.homeTeam}
-          </p>
-          <img
-            className="h-12 w-12 lg:h-24 lg:w-24"
-            src={`https://a.espncdn.com/i/teamlogos/nba/500/${bet.better_team}.png`}
-          />
-          <div className="flex w-full flex-row items-center justify-between border-t border-black">
-            <div className="flex flex-col justify-start">
-              <p>Odds</p>
-              <p>-100 on {bet.better_team}</p>
-            </div>
-            <div className="flex flex-col justify-end">
-              <p className="text-end">Total Pot</p>
-              <p className="text-end">
-                {utils.format.formatNearAmount(
-                  (
-                    parseInt(bet.better_deposit) +
-                    parseInt(bet.market_maker_deposit)
-                  ).toLocaleString("en-US", {
-                    useGrouping: false,
-                  }),
-                  2
-                )}{" "}
-                N
-              </p>
-            </div>
-          </div>
-          <div className="mt-4 flex w-full flex-row items-center justify-between">
-            <p>
-              You pay <span className="font-extrabold">5 N</span>
-            </p>
-            <button className="mx-1 inline-flex items-center justify-center whitespace-nowrap rounded-md border border-transparent bg-orange-600 px-1 py-1 text-base font-medium text-white shadow-sm hover:bg-orange-400">
-              {" "}
-              Accept Bet
-            </button>
+          <div className="fixed inset-0 bg-black bg-opacity-25" />
+        </Transition.Child>
+
+        <div className="fixed inset-0 overflow-y-auto">
+          <div className="flex min-h-full items-center justify-center p-4 text-center">
+            <Transition.Child
+              as={Fragment}
+              enter="ease-out duration-300"
+              enterFrom="opacity-0 scale-95"
+              enterTo="opacity-100 scale-100"
+              leave="ease-in duration-200"
+              leaveFrom="opacity-100 scale-100"
+              leaveTo="opacity-0 scale-95"
+            >
+              <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                <Dialog.Title
+                  as="h3"
+                  className="text-lg font-medium leading-6 text-gray-900"
+                >
+                  Payment successful
+                </Dialog.Title>
+                <div className="mt-2">
+                  <p className="text-sm text-gray-500">
+                    Your payment has been successfully submitted. We’ve sent you
+                    an email with all of the details of your order.
+                  </p>
+                </div>
+
+                <div className="mt-4">
+                  <button
+                    type="button"
+                    className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                    onClick={() => modalData.setIsModalOpen(false)}
+                  >
+                    Got it, thanks!
+                  </button>
+                </div>
+              </Dialog.Panel>
+            </Transition.Child>
           </div>
         </div>
-      ))}
-    </div>
+      </Dialog>
+    </Transition>
   );
 };
