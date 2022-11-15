@@ -194,7 +194,6 @@ impl NBABetsDate {
     }
 
     // View Methods
-    
     pub fn get_all_bets(&self ) -> Vec<NBABet> {
         self.bets.get(&SEASON.to_string()).unwrap_or(vec![])
     }
