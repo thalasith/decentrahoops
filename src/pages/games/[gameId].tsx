@@ -242,7 +242,6 @@ const BetModal = (modalData: {
   const [marketMakerTeam, setMarketMakerTeam] = useState("");
   const [betterTeam, setBetterTeam] = useState("");
   const [marketMakerDeposit, setMarketMakerDeposit] = useState(0);
-  const [betterDeposit, setBetterDeposit] = useState(0);
   const [americanOdds, setAmericanOdds] = useState(0);
   const [phase, setPhase] = useState(1);
   const { selector, accountId } = useWalletSelector();
@@ -264,30 +263,35 @@ const BetModal = (modalData: {
   };
 
   const FirstPhase = () => (
-    <div className="mt-2 flex flex-row items-center justify-center">
-      <button
-        className={`rounded-md p-2 hover:bg-orange-200 ${
-          marketMakerTeam === modalData.awayTeam && " bg-orange-200"
-        }`}
-        onClick={() => handleTeamSelection(modalData.awayTeam)}
-      >
-        <img
-          className="h-36 w-36"
-          src={`https://a.espncdn.com/combiner/i?img=/i/teamlogos/nba/500/${modalData.awayTeam}.png`}
-        />
-      </button>
-      <p className="mx-8 text-center text-4xl text-gray-500">vs</p>
-      <button
-        className={`rounded-md p-2 hover:bg-orange-200 ${
-          marketMakerTeam === modalData.homeTeam && " bg-orange-200"
-        }`}
-        onClick={() => handleTeamSelection(modalData.homeTeam)}
-      >
-        <img
-          className="h-36 w-36"
-          src={`https://a.espncdn.com/combiner/i?img=/i/teamlogos/nba/500/${modalData.homeTeam}.png`}
-        />
-      </button>
+    <div className="mt-2 flex flex-col items-center">
+      <div className="mt-2 flex flex-row items-center justify-center">
+        <button
+          className={`rounded-md p-2 hover:bg-orange-200 ${
+            marketMakerTeam === modalData.awayTeam && " bg-orange-200"
+          }`}
+          onClick={() => handleTeamSelection(modalData.awayTeam)}
+        >
+          <img
+            className="h-36 w-36"
+            src={`https://a.espncdn.com/combiner/i?img=/i/teamlogos/nba/500/${modalData.awayTeam}.png`}
+          />
+        </button>
+        <p className="mx-8 text-center text-4xl text-gray-500">vs</p>
+        <button
+          className={`rounded-md p-2 hover:bg-orange-200 ${
+            marketMakerTeam === modalData.homeTeam && " bg-orange-200"
+          }`}
+          onClick={() => handleTeamSelection(modalData.homeTeam)}
+        >
+          <img
+            className="h-36 w-36"
+            src={`https://a.espncdn.com/combiner/i?img=/i/teamlogos/nba/500/${modalData.homeTeam}.png`}
+          />
+        </button>
+      </div>
+      <div className="text-xs italic text-red-500">
+        {" " + validationErrors.noTeamSelected}
+      </div>
     </div>
   );
 
@@ -354,7 +358,6 @@ const BetModal = (modalData: {
     };
 
     const wallet = await selector.wallet();
-    console.log(wallet);
     return wallet
       .signAndSendTransaction({
         signerId: accountId!,
@@ -384,12 +387,12 @@ const BetModal = (modalData: {
         ...validationErrors,
         negativeBettingAmount: "You can't bet negative amounts",
       });
-    } else if (name === "americanOdds" && Math.abs(value) < 99) {
+    } else if (name === "americanOdds" && Math.abs(value) < 100) {
       setValidationErrors({
         ...validationErrors,
         wrongBettingOdds: "Your odds must be between -100 and 100.",
       });
-    } else if (name === "americanOdds" && Math.abs(value) > 100) {
+    } else if (name === "americanOdds" && Math.abs(value) > 99) {
       setValidationErrors({
         ...validationErrors,
         wrongBettingOdds: "",
@@ -399,6 +402,30 @@ const BetModal = (modalData: {
         ...validationErrors,
         negativeBettingAmount: "",
       });
+    }
+  };
+
+  const handleSetPhases = () => {
+    if (phase === 1 && marketMakerTeam === "") {
+      setValidationErrors({
+        ...validationErrors,
+        noTeamSelected: "You must select a team to bet on.",
+      });
+      return;
+    } else if (phase === 2 && marketMakerDeposit < 0.1) {
+      setValidationErrors({
+        ...validationErrors,
+        negativeBettingAmount: "You can't bet negative amounts",
+      });
+      return;
+    } else if (phase === 2 && americanOdds < 99) {
+      setValidationErrors({
+        ...validationErrors,
+        wrongBettingOdds: "Your odds must be between -100 and 100.",
+      });
+      return;
+    } else {
+      setPhase(phase + 1);
     }
   };
 
@@ -525,7 +552,7 @@ const BetModal = (modalData: {
                       Ready to bet!
                     </PrimaryButton>
                   ) : (
-                    <SecondaryButton onClick={() => setPhase(phase + 1)}>
+                    <SecondaryButton onClick={() => handleSetPhases()}>
                       Next
                     </SecondaryButton>
                   )}
