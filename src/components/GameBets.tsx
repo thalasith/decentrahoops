@@ -1,11 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
-
 import { useWalletSelector } from "../contexts/WalletSelectorContext";
-import { providers, utils, Contract } from "near-api-js";
-import type {
-  AccountView,
-  CodeResult,
-} from "near-api-js/lib/providers/provider";
+import { providers, utils } from "near-api-js";
+import type { CodeResult } from "near-api-js/lib/providers/provider";
 import { CONTRACT_ID } from "../constants";
 import PrimaryButton from "./PrimaryButton";
 
