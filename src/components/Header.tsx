@@ -7,6 +7,7 @@ import { Popover, Transition } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { GiBasketballBall } from "react-icons/gi";
 import PrimaryButton from "./PrimaryButton";
+import Link from "next/link";
 
 export default function Header() {
   const { selector, modal, accounts, accountId } = useWalletSelector();
@@ -64,14 +65,25 @@ export default function Header() {
 
   return (
     <Popover className="relative border-b border-gray-600">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6">
-        <div className="flex items-center justify-between  py-6 md:justify-start md:space-x-10">
+      <div className="mx-auto max-w-[100rem] px-4 sm:px-6">
+        <div className="flex items-center justify-between py-6 md:justify-start md:space-x-20">
           <div className="flex items-center justify-start lg:w-0 lg:flex-1">
             <a href="#">
               <span className="sr-only">Your Company</span>
               <GiBasketballBall className="h-8 w-auto text-orange-600 sm:h-10" />
             </a>
             <div className="ml-4 text-4xl font-bold">Decentrahoops</div>
+          </div>
+          <div className="flex flex-row">
+            <Link href="/games" className="mx-4 hover:text-gray-500">
+              Games
+            </Link>
+            <Link href="/open_bets" className="mx-4 hover:text-gray-500">
+              Open Bets
+            </Link>
+            <Link href="/your_bets" className="mx-4 hover:text-gray-500">
+              Your Bets
+            </Link>
           </div>
           <div className="-my-2 -mr-2 md:hidden">
             <Popover.Button className="inline-flex items-center justify-center rounded-md bg-white p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-orange-500">
@@ -118,13 +130,14 @@ export default function Header() {
             <div className="px-5 pt-5 pb-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <a href="#">
+                  <a href="#" className="flex flex-row">
                     <GiBasketballBall className="h-8 w-auto text-orange-600 sm:h-10" />
                     <div className="ml-4 text-2xl font-bold text-slate-800">
                       Decentrahoops
                     </div>
                   </a>
                 </div>
+                <span className="text-black">test</span>
                 <div className="-mr-2">
                   <Popover.Button className="inline-flex items-center justify-center rounded-md bg-white p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500">
                     <span className="sr-only">Close menu</span>
