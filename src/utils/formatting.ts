@@ -1,3 +1,14 @@
+export const dateStringEditor = (date: Date) => {
+  const day =
+    date.getDate() < 10
+      ? "0" + date.getDate().toLocaleString()
+      : date.getDate().toLocaleString();
+  const month = (date.getMonth() + 1).toLocaleString();
+  const year = date.getFullYear().toLocaleString().replace(/,/g, "");
+
+  return year + month + day;
+};
+
 export const americanOddsCalculator = (amount: number, total: number) => {
   if (total / amount - 1 >= 2) {
     return (

@@ -10,14 +10,17 @@ import { useWindowWidth } from "@react-hook/window-size";
 import Link from "next/link";
 import { RiArrowGoBackFill } from "react-icons/ri";
 import GameBets from "../../components/GameBets";
-import PrimaryButton from "../../components/PrimaryButton";
 
+import PrimaryButton from "../../components/PrimaryButton";
+import SecondaryButton from "../../components/SecondaryButton";
+import { dateStringEditor } from "../../utils/formatting";
 import { Dialog, Transition } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import {
   americanOddsCalculator,
   payOutFromAmericanOdds,
 } from "../../utils/formatting";
+const BOATLOAD_OF_GAS = utils.format.parseNearAmount("0.00000000003")!;
 
 import { useWalletSelector } from "../../contexts/WalletSelectorContext";
 import { providers, utils } from "near-api-js";
@@ -26,8 +29,9 @@ import type {
   CodeResult,
 } from "near-api-js/lib/providers/provider";
 import { CONTRACT_ID } from "../../constants";
+import { parseNearAmount } from "near-api-js/lib/utils/format";
 
-const Home: NextPage = () => {
+const GameId: NextPage = () => {
   const router = useRouter();
   const { gameId } = router.query as { gameId: string };
   const windowWidth = useWindowWidth();
@@ -207,6 +211,8 @@ const Home: NextPage = () => {
                 setIsModalOpen={setIsModalOpen}
                 homeTeam={boxscore?.data.competitors[0].team.abbreviation}
                 awayTeam={boxscore?.data.competitors[1].team.abbreviation}
+                gameId={boxscore?.data.id}
+                gameDate={boxscore?.data.date}
               />
             )}
             {boxscore?.isSuccess && (
@@ -223,19 +229,24 @@ const Home: NextPage = () => {
   );
 };
 
-export default Home;
+export default GameId;
 
 const BetModal = (modalData: {
   isModalOpen: boolean;
   setIsModalOpen: any;
   homeTeam: string;
   awayTeam: string;
+  gameId: string;
+  gameDate: string;
 }) => {
   const [marketMakerTeam, setMarketMakerTeam] = useState("");
-  const [marketMakerDeposit, setMarketMakerDeposit] = useState(0);
-  const [americanOdds, setAmericanOdds] = useState(0);
   const [betterTeam, setBetterTeam] = useState("");
+  const [marketMakerDeposit, setMarketMakerDeposit] = useState(0);
+  const [betterDeposit, setBetterDeposit] = useState(0);
+  const [americanOdds, setAmericanOdds] = useState(0);
   const [phase, setPhase] = useState(1);
+  const { selector, accountId } = useWalletSelector();
+
   const [validationErrors, setValidationErrors] = useState({
     noTeamSelected: "",
     negativeBettingAmount: "",
@@ -249,34 +260,6 @@ const BetModal = (modalData: {
     } else {
       setMarketMakerTeam(modalData.awayTeam);
       setBetterTeam(modalData.homeTeam);
-    }
-  };
-  const handleOdds = (value: number) => {
-    if (Math.abs(value) >= 100) {
-      setAmericanOdds(value);
-      setValidationErrors({
-        ...validationErrors,
-        wrongBettingOdds: "",
-      });
-    } else {
-      setValidationErrors({
-        ...validationErrors,
-        wrongBettingOdds: "Please put in valid odds (between -100 and 100)",
-      });
-    }
-  };
-  const handleMarketMakerDeposit = (value: number) => {
-    if (value > 0) {
-      setMarketMakerDeposit(value);
-      setValidationErrors({
-        ...validationErrors,
-        negativeBettingAmount: "",
-      });
-    } else {
-      setValidationErrors({
-        ...validationErrors,
-        negativeBettingAmount: "Please input a valid positive amount",
-      });
     }
   };
 
@@ -308,54 +291,116 @@ const BetModal = (modalData: {
     </div>
   );
 
-  const SecondPhase = () => (
-    <div className="flex flex-row items-center justify-center">
-      <div className="py-2">
-        <label
-          htmlFor="marketMakerTeam"
-          className="block text-sm font-medium text-gray-700"
-        >
-          Amount you are betting on {marketMakerTeam}
-        </label>
-        <div className="py-2">
-          <input
-            type="number"
-            name="marketMakerDeposit"
-            id="marketMakerDeposit"
-            className="block w-full rounded-md border border-solid border-gray-300  py-2 pl-4 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-            placeholder="Amount you will bet"
-            onChange={(e) => handleMarketMakerDeposit(parseInt(e.target.value))}
-          />
-        </div>
-        <label
-          htmlFor="marketMakerTeam"
-          className="block text-sm font-medium text-gray-700"
-        >
-          Your betting odds on {marketMakerTeam}
-        </label>
-        <div className="py-2">
-          <input
-            className="block w-full rounded-md border border-solid border-gray-300  py-2 pl-4 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-            type="number"
-            name="marketMakerDeposit"
-            onChange={(e) => handleOdds(parseInt(e.target.value))}
-            placeholder="Your Bettings Odds"
-          />
-          <div className="text-xs italic text-red-500">
-            {validationErrors.wrongBettingOdds
-              ? validationErrors.wrongBettingOdds
-              : " "}
-          </div>
-        </div>
+  const ThirdPhase = () => {
+    return (
+      <div className="lg:px:20 w-full px-8 pt-2">
+        <h3 className="w-full py-1  text-sm font-bold text-black lg:text-2xl">
+          Review your bet information:
+        </h3>
+        <p className="py-1 text-gray-500 lg:text-xl">
+          1. The winner will get{" "}
+          <span className="font-bold text-black">
+            {payOutFromAmericanOdds(marketMakerDeposit, americanOdds)} N.
+          </span>
+        </p>
+        <p className="py-1 text-sm text-gray-500 lg:text-xl">
+          2. You are betting{" "}
+          <span className="font-bold text-black">{marketMakerDeposit} N</span>{" "}
+          on <span className="font-bold text-black">{marketMakerTeam}.</span>{" "}
+          Your odds are{" "}
+          <span className="font-bold text-black">{americanOdds}.</span>
+        </p>
+        <p className="py-1 text-sm text-gray-500 lg:text-xl">
+          3. Your opponent will be betting{" "}
+          <span className="font-bold text-black">
+            {payOutFromAmericanOdds(marketMakerDeposit, americanOdds) -
+              marketMakerDeposit}{" "}
+            N
+          </span>{" "}
+          on <span className="font-bold text-black">{betterTeam}</span>. Their
+          odds are{" "}
+          <span className="font-bold text-black">
+            {americanOddsCalculator(
+              payOutFromAmericanOdds(marketMakerDeposit, americanOdds) -
+                marketMakerDeposit,
+              payOutFromAmericanOdds(marketMakerDeposit, americanOdds)
+            )}
+          </span>
+          .
+        </p>
+        <p className="py-1 text-sm text-gray-500 lg:text-xl">
+          4. If an opponent is found, you have{" "}
+          <span className="font-bold text-black">2 hours</span> before tip-off
+          to cancel the bet.
+        </p>
       </div>
-    </div>
-  );
+    );
+  };
 
-  const ThirdPhase = () => (
-    <div className="mt-2 flex flex-row items-center justify-center">
-      ThirdPhase
-    </div>
-  );
+  const makeBet = useCallback(async () => {
+    const betterAmount =
+      payOutFromAmericanOdds(marketMakerDeposit, americanOdds) -
+      marketMakerDeposit;
+    const bet = {
+      better_amount: parseNearAmount(betterAmount.toLocaleString()),
+      game_id: modalData.gameId,
+      game_date: dateStringEditor(new Date(modalData.gameDate)),
+      market_maker_amount: parseNearAmount(marketMakerDeposit.toLocaleString()),
+      market_maker_team: marketMakerTeam,
+      better_team: betterTeam,
+      start_time_utc: modalData.gameDate,
+      // ToDo: remove game_url_code and
+      game_url_code: modalData.gameId,
+    };
+
+    const wallet = await selector.wallet();
+    console.log(wallet);
+    return wallet
+      .signAndSendTransaction({
+        signerId: accountId!,
+        receiverId: CONTRACT_ID,
+        actions: [
+          {
+            type: "FunctionCall",
+            params: {
+              methodName: "create_bet",
+              args: bet,
+              gas: BOATLOAD_OF_GAS,
+              deposit: parseNearAmount(betterAmount.toLocaleString())!,
+            },
+          },
+        ],
+      })
+      .catch((err) => {
+        alert(err);
+        console.log(err);
+        throw err;
+      });
+  }, [selector]);
+
+  const handleInputError = (name: string, value: number) => {
+    if (name === "marketMakerDeposit" && value < 0.1) {
+      setValidationErrors({
+        ...validationErrors,
+        negativeBettingAmount: "You can't bet negative amounts",
+      });
+    } else if (name === "americanOdds" && Math.abs(value) < 99) {
+      setValidationErrors({
+        ...validationErrors,
+        wrongBettingOdds: "Your odds must be between -100 and 100.",
+      });
+    } else if (name === "americanOdds" && Math.abs(value) > 100) {
+      setValidationErrors({
+        ...validationErrors,
+        wrongBettingOdds: "",
+      });
+    } else if (name === "marketMakerDeposit" && value >= 0) {
+      setValidationErrors({
+        ...validationErrors,
+        negativeBettingAmount: "",
+      });
+    }
+  };
 
   return (
     <Transition appear show={modalData.isModalOpen} as={Fragment}>
@@ -387,7 +432,7 @@ const BetModal = (modalData: {
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-11/12 transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all lg:w-1/3">
+              <Dialog.Panel className="w-11/12 transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all lg:w-2/5">
                 <Dialog.Title
                   as="h3"
                   className="flex justify-between text-lg font-medium leading-6 text-gray-900"
@@ -399,7 +444,69 @@ const BetModal = (modalData: {
                 </Dialog.Title>
 
                 {phase === 1 && <FirstPhase />}
-                {phase === 2 && <SecondPhase />}
+                {phase === 2 && (
+                  <div className="flex flex-row items-center justify-center">
+                    <div className="py-2">
+                      <label
+                        htmlFor="marketMakerTeam"
+                        className="block text-sm font-medium text-gray-700"
+                      >
+                        Amount you are betting on {marketMakerTeam}
+                      </label>
+                      <div className="py-2">
+                        <input
+                          type="number"
+                          name="marketMakerDeposit"
+                          id="marketMakerDeposit"
+                          className="block w-full rounded-md border border-solid border-gray-300  py-2 pl-4 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                          placeholder="Amount you will bet"
+                          onBlur={(e) =>
+                            handleInputError(
+                              e.target.name,
+                              Number(e.target.value)
+                            )
+                          }
+                          onChange={(e) =>
+                            setMarketMakerDeposit(Number(e.target.value))
+                          }
+                        />
+                        <div className="text-xs italic text-red-500">
+                          {validationErrors.negativeBettingAmount
+                            ? validationErrors.negativeBettingAmount
+                            : " "}
+                        </div>
+                      </div>
+                      <label
+                        htmlFor="marketMakerTeam"
+                        className="block text-sm font-medium text-gray-700"
+                      >
+                        Your betting odds on {marketMakerTeam}
+                      </label>
+                      <div className="py-2">
+                        <input
+                          className="block w-full rounded-md border border-solid border-gray-300  py-2 pl-4 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                          type="number"
+                          name="americanOdds"
+                          onChange={(e) =>
+                            setAmericanOdds(parseInt(e.target.value))
+                          }
+                          onBlur={(e) =>
+                            handleInputError(
+                              e.target.name,
+                              Number(e.target.value)
+                            )
+                          }
+                          placeholder="Your Bettings Odds"
+                        />
+                        <div className="text-xs italic text-red-500">
+                          {validationErrors.wrongBettingOdds
+                            ? validationErrors.wrongBettingOdds
+                            : " "}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
                 {phase === 3 && <ThirdPhase />}
 
                 <div
@@ -408,14 +515,20 @@ const BetModal = (modalData: {
                   }`}
                 >
                   <div className={phase === 1 ? "hidden" : "flex"}>
-                    <PrimaryButton onClick={() => setPhase(phase - 1)}>
+                    <SecondaryButton onClick={() => setPhase(phase - 1)}>
                       Previous
-                    </PrimaryButton>
+                    </SecondaryButton>
                   </div>
 
-                  <PrimaryButton onClick={() => setPhase(phase + 1)}>
-                    Next
-                  </PrimaryButton>
+                  {phase == 3 ? (
+                    <PrimaryButton onClick={() => makeBet()}>
+                      Ready to bet!
+                    </PrimaryButton>
+                  ) : (
+                    <SecondaryButton onClick={() => setPhase(phase + 1)}>
+                      Next
+                    </SecondaryButton>
+                  )}
                 </div>
               </Dialog.Panel>
             </Transition.Child>

@@ -6,20 +6,11 @@ import { trpc } from "../utils/trpc";
 import Head from "next/head";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
 import { WEEK_DAYS, MONTH_NAMES } from "../constants";
+import { dateStringEditor } from "../utils/formatting";
 
 import Header from "../components/Header";
 import { WalletSelectorContextProvider } from "../contexts/WalletSelectorContext";
 
-const dateStringEditor = (date: Date) => {
-  const day =
-    date.getDate() < 10
-      ? "0" + date.getDate().toLocaleString()
-      : date.getDate().toLocaleString();
-  const month = (date.getMonth() + 1).toLocaleString();
-  const year = date.getFullYear().toLocaleString().replace(/,/g, "");
-
-  return year + month + day;
-};
 const Games: NextPage = () => {
   const [shownDay, setShownDay] = useState(new Date());
   const [shownDates, setShownDates] = useState<Date[]>([]);
@@ -57,7 +48,7 @@ const Games: NextPage = () => {
 
   const handleSetDay = async (date: Date) => {
     setShownDay(date);
-    // setShownDates(nextWeek(date));
+    setShownDates(nextWeek(date));
   };
 
   const handlePreviousWeek = () => {
