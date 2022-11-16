@@ -1,20 +1,17 @@
 import { useState, useEffect } from "react";
 import { type NextPage } from "next";
 import Link from "next/link";
-import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { trpc } from "../utils/trpc";
 import Head from "next/head";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
 import { WEEK_DAYS, MONTH_NAMES } from "../constants";
 import { dateStringEditor } from "../utils/formatting";
-
 import Header from "../components/Header";
 import { WalletSelectorContextProvider } from "../contexts/WalletSelectorContext";
 
 const Games: NextPage = () => {
   const [shownDay, setShownDay] = useState(new Date());
   const [shownDates, setShownDates] = useState<Date[]>([]);
-  const [parent] = useAutoAnimate(/* optional config */);
 
   const { data: games } = trpc.nbaGames.gamesByDay.useQuery({
     date: dateStringEditor(shownDay),
@@ -22,7 +19,7 @@ const Games: NextPage = () => {
 
   useEffect(() => {
     const handleInit = async () => {
-      const dates = nextWeek(shownDay);
+      const dates = midWeek(shownDay);
 
       setShownDates(dates);
     };
@@ -30,37 +27,34 @@ const Games: NextPage = () => {
     handleInit();
   }, []);
 
-  const previousWeek = (date: Date) => {
-    const newDates = [];
-    for (let i = 0; i < 7; i++) {
-      newDates.push(new Date(date.getTime() - i * 24 * 60 * 60 * 1000));
+  const midWeek = (date: Date) => {
+    const week = [];
+    for (let i = 0; i < 4; i++) {
+      week.push(new Date(date.getTime() - i * 24 * 60 * 60 * 1000));
     }
-    return newDates.reverse();
+    week.reverse();
+    for (let i = 1; i < 4; i++) {
+      week.push(new Date(date.getTime() + i * 24 * 60 * 60 * 1000));
+    }
+    return week;
   };
 
-  const nextWeek = (date: Date) => {
-    const nextFiveDays = [];
-    for (let i = 0; i < 7; i++) {
-      nextFiveDays.push(new Date(date.getTime() + i * 24 * 60 * 60 * 1000));
-    }
-    return nextFiveDays;
-  };
+  console.log(midWeek(shownDay));
 
   const handleSetDay = async (date: Date) => {
     setShownDay(date);
-    setShownDates(nextWeek(date));
   };
 
   const handlePreviousWeek = () => {
     const newShownDay = new Date(shownDay.getTime() - 7 * 24 * 60 * 60 * 1000);
-    const newDates = previousWeek(newShownDay);
+    const newDates = midWeek(newShownDay);
     setShownDates(newDates);
     setShownDay(newShownDay);
   };
 
   const handleNextWeek = () => {
     const newShownDay = new Date(shownDay.getTime() + 7 * 24 * 60 * 60 * 1000);
-    const newDates = nextWeek(newShownDay);
+    const newDates = midWeek(newShownDay);
     setShownDates(newDates);
     setShownDay(newShownDay);
   };

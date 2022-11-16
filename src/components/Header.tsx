@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback, useEffect, useState } from "react";
+import { Fragment, useCallback, useEffect, useState } from "react";
 import { providers, utils } from "near-api-js";
 import type { AccountView } from "near-api-js/lib/providers/provider";
 import type { Account } from "../interfaces";
@@ -74,12 +74,14 @@ export default function Header() {
       <div className="mx-auto max-w-[100rem] px-4 sm:px-6">
         <div className="flex items-center justify-between py-6 ">
           <div className="flex items-center justify-start lg:w-0 lg:flex-1">
-            <a className="flex" href="#">
+            <Link className="flex" href="/">
               <GiBasketballBall className="h-8 w-auto text-orange-600 sm:h-10" />
-              <div className="ml-4 font-bold lg:text-4xl">Decentrahoops</div>
-            </a>
+              <div className="ml-4 text-2xl font-bold lg:text-4xl">
+                Decentrahoops
+              </div>
+            </Link>
           </div>
-          <div className="flex flex-row items-start justify-start">
+          <div className="hidden flex-row items-start justify-start lg:flex">
             <Link href="/games" className="mx-2 hover:text-gray-500">
               <PrimaryButton>Games</PrimaryButton>
             </Link>
@@ -96,7 +98,7 @@ export default function Header() {
               <Bars3Icon className="h-6 w-6" aria-hidden="true" />
             </Popover.Button>
           </div>
-          <div className=" flex items-center">
+          <div className="hidden items-center lg:flex">
             {account ? (
               <div className="mr-4">
                 Your Balance: {utils.format.formatNearAmount(account.amount, 2)}{" "}
@@ -185,29 +187,11 @@ export default function Header() {
             ) : (
               <button className="flex" onClick={handleSignIn}>
                 {" "}
-                <GoSignIn className="mr-2 h-5 w-5" aria-hidden="true" /> Sign In{" "}
+                <GoSignIn className="mr-2 h-5 w-5" aria-hidden="true" /> Connect
+                Wallet{" "}
               </button>
             )}
           </div>
-
-          {/* <div className="hidden items-center justify-end md:flex md:flex-1 lg:w-0">
-            {account ? (
-              <div>
-                Your Balance: {utils.format.formatNearAmount(account.amount, 2)}{" "}
-                N
-                <PrimaryButton onClick={handleSwitchWallet}>
-                  Switch Wallet
-                </PrimaryButton>
-                <PrimaryButton onClick={handleSignOut}>
-                  Disconnect Wallet
-                </PrimaryButton>
-              </div>
-            ) : (
-              <PrimaryButton onClick={handleSignIn}>
-                Connect Wallet
-              </PrimaryButton>
-            )}
-          </div> */}
         </div>
       </div>
 
@@ -227,15 +211,14 @@ export default function Header() {
           <div className="divide-y-2 divide-gray-50 rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5">
             <div className="px-5 pt-5 pb-6">
               <div className="flex items-center justify-between">
-                <div>
-                  <a href="#" className="flex flex-row">
+                <div className="flex items-center justify-start">
+                  <Link href="/" className="flex flex-row">
                     <GiBasketballBall className="h-8 w-auto text-orange-600 sm:h-10" />
-                    <div className="ml-4 text-2xl font-bold text-slate-800">
+                    <div className="ml-3 text-2xl font-bold text-slate-800">
                       Decentrahoops
                     </div>
-                  </a>
+                  </Link>
                 </div>
-                <span className="text-black">test</span>
                 <div className="-mr-2">
                   <Popover.Button className="inline-flex items-center justify-center rounded-md bg-white p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500">
                     <span className="sr-only">Close menu</span>
@@ -244,6 +227,64 @@ export default function Header() {
                 </div>
               </div>
             </div>
+            <div className="space-y-1 px-2 pt-2 pb-3">
+              <Link
+                href="/games"
+                className="block rounded-md px-3 py-2 text-base font-medium text-slate-600 hover:bg-gray-50 hover:text-gray-900"
+              >
+                Games
+              </Link>
+              <Link
+                href="open_bets"
+                className="block rounded-md px-3 py-2 text-base font-medium text-slate-600 hover:bg-gray-50 hover:text-gray-900"
+              >
+                All Open Bets
+              </Link>
+              <Link
+                href="your_bets"
+                className="block rounded-md px-3 py-2 text-base font-medium text-slate-600 hover:bg-gray-50 hover:text-gray-900"
+              >
+                Your Bets
+              </Link>
+            </div>
+
+            {account ? (
+              <div className="flex flex-col items-center">
+                <p className="mb-2 text-center text-slate-600">
+                  Your Balance:{" "}
+                  <span className="font-extrabold">
+                    {utils.format.formatNearAmount(account.amount, 2)} N
+                  </span>
+                </p>
+                <button
+                  onClick={handleSwitchWallet}
+                  className="mx-1 my-2 inline-flex w-4/5 items-center justify-center whitespace-nowrap rounded-md border border-transparent bg-orange-600 py-1 text-base font-medium text-white shadow-sm hover:bg-orange-400"
+                >
+                  <HiOutlineSwitchHorizontal
+                    className="mr-2 h-5 w-5"
+                    aria-hidden="true"
+                  />{" "}
+                  Switch Wallets
+                </button>
+                <button
+                  onClick={handleSignOut}
+                  className="mx-1 my-2 inline-flex w-4/5 items-center justify-center whitespace-nowrap rounded-md border border-transparent bg-orange-600 py-1 text-base font-medium text-white shadow-sm hover:bg-orange-400"
+                >
+                  <GoSignOut className="mr-2 h-5 w-5" aria-hidden="true" />{" "}
+                  Disconnect Wallet
+                </button>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center">
+                <button
+                  onClick={handleSignIn}
+                  className="mx-1 my-2 inline-flex w-4/5 items-center justify-center whitespace-nowrap rounded-md border border-transparent bg-orange-600 py-1 text-base font-medium text-white shadow-sm hover:bg-orange-400"
+                >
+                  <GoSignIn className="mr-2 h-5 w-5" aria-hidden="true" />{" "}
+                  Connect Wallet{" "}
+                </button>
+              </div>
+            )}
           </div>
         </Popover.Panel>
       </Transition>

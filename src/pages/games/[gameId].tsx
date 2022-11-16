@@ -1,5 +1,5 @@
 import { type NextPage } from "next";
-import { useState, useEffect, useCallback, Fragment } from "react";
+import { useState } from "react";
 import Head from "next/head";
 import Header from "../../components/Header";
 import { WalletSelectorContextProvider } from "../../contexts/WalletSelectorContext";
