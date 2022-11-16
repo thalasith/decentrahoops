@@ -46,10 +46,15 @@ const GameBetModal = (modalData: {
     }
   };
 
-  // console.log("american Odds outside: ", americanOdds);
+  console.log(marketMakerTeam);
 
   const makeBet = useCallback(
-    async (odds: number, makerAmount: number) => {
+    async (
+      odds: number,
+      makerAmount: number,
+      makerTeam: string,
+      betTeam: string
+    ) => {
       const betterAmount =
         payOutFromAmericanOdds(makerAmount, odds) - makerAmount;
 
@@ -58,13 +63,12 @@ const GameBetModal = (modalData: {
         game_id: modalData.gameId,
         game_date: dateStringEditor(new Date(modalData.gameDate)),
         market_maker_amount: parseNearAmount(makerAmount.toLocaleString()),
-        market_maker_team: marketMakerTeam,
-        better_team: betterTeam,
+        market_maker_team: makerTeam,
+        better_team: betTeam,
         start_time_utc: modalData.gameDate,
-        // ToDo: remove game_url_code and
-        game_url_code: modalData.gameId,
+        away_team: modalData.awayTeam,
+        home_team: modalData.homeTeam,
       };
-      console.log(bet);
 
       const wallet = await selector.wallet();
 
@@ -340,7 +344,14 @@ const GameBetModal = (modalData: {
 
                   {phase == 3 ? (
                     <PrimaryButton
-                      onClick={() => makeBet(americanOdds, marketMakerDeposit)}
+                      onClick={() =>
+                        makeBet(
+                          americanOdds,
+                          marketMakerDeposit,
+                          marketMakerTeam,
+                          betterTeam
+                        )
+                      }
                     >
                       Ready to bet!
                     </PrimaryButton>

@@ -4,13 +4,14 @@ import { providers, utils } from "near-api-js";
 import type { CodeResult } from "near-api-js/lib/providers/provider";
 import { CONTRACT_ID } from "../constants";
 import PrimaryButton from "./PrimaryButton";
+import { Bet } from "../interfaces";
 
 const BOATLOAD_OF_GAS = utils.format.parseNearAmount("0.00000000003")!;
 
 const OpenBets = () => {
   const { selector, accountId } = useWalletSelector();
   const [bets, setBets] = useState([]);
-
+  console.log(bets);
   const getBets = useCallback(() => {
     const { network } = selector.options;
 
@@ -59,14 +60,14 @@ const OpenBets = () => {
   );
 
   return (
-    <div className=" mx-auto mt-4 flex w-10/12 flex-row items-center justify-center">
-      {bets.map((bet: any, key: number) => (
+    <div className="mx-auto mt-4 flex w-10/12 flex-row items-center justify-center">
+      {bets.map((bet: Bet, key: number) => (
         <div
           key={key}
-          className="my-2 mx-2 flex w-full flex-col items-center rounded bg-orange-200 py-2 px-4 text-slate-600"
+          className="my-2 mx-2 flex w-1/5 flex-col items-center rounded bg-orange-200 py-2 px-4 text-slate-600"
         >
           <p>
-            {bet.market_maker_team} vs {bet.better_team}
+            {bet.away_team} vs {bet.home_team}
           </p>
           <img
             className="h-12 w-12 lg:h-24 lg:w-24"

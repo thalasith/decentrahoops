@@ -3,8 +3,9 @@ import Head from "next/head";
 import Header from "../components/Header";
 import { WalletSelectorContextProvider } from "../contexts/WalletSelectorContext";
 import Content from "../components/Content";
+import YourBets from "../components/YourBets";
 
-const YourBets: NextPage = () => {
+const YourBetsPage: NextPage = () => {
   return (
     <>
       <Head>
@@ -15,10 +16,9 @@ const YourBets: NextPage = () => {
       <main className="bg-gray-800 text-white">
         <WalletSelectorContextProvider>
           <Header />
-          <div className="container mx-auto flex min-h-screen flex-col items-center justify-center p-4">
-            <h1>NEAR Guest Book</h1>
-
-            <Content />
+          <div className="container mx-auto flex min-h-screen flex-col items-center p-4">
+            <h1 className="py-4 text-6xl font-extrabold">Your Bets</h1>
+            <YourBets />
           </div>
         </WalletSelectorContextProvider>
       </main>
@@ -26,4 +26,4 @@ const YourBets: NextPage = () => {
   );
 };
 
-export default YourBets;
+export default YourBetsPage;

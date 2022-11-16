@@ -24,7 +24,8 @@ pub struct NBABet {
     winner: Option<AccountId>,
     winning_team: Option<String>,
     paid_out: bool,
-    game_url_code:String
+    away_team: String,
+    home_team: String,
 }
 
 #[near_bindgen]
@@ -52,9 +53,12 @@ impl NBABetsDate {
         }
     }
     #[payable]
-    pub fn create_bet(&mut self, better_amount:U128, game_id: String, game_date: String, market_maker_team: String, better_team: String, start_time_utc: String, game_url_code: String) {
+    pub fn create_bet(&mut self, better_amount:U128, game_id: String, game_date: String, market_maker_team: String, better_team: String, start_time_utc: String, away_team: String, home_team: String) {
         assert!(NBA_TEAMS.contains(&market_maker_team.as_str()) == true, "Market maker team not found");
         assert!(NBA_TEAMS.contains(&better_team.as_str()) == true , "Better team not found");
+        assert!(NBA_TEAMS.contains(&away_team.as_str()) == true , "Away team not found");
+        assert!(NBA_TEAMS.contains(&home_team.as_str()) == true , "Home team not found");
+        
         let game_day = game_date.clone();
         let game_id = game_id.clone();
         let amount = env::attached_deposit();
@@ -79,7 +83,8 @@ impl NBABetsDate {
             winner: None, 
             winning_team: None,
             paid_out: false,
-            game_url_code: game_url_code.to_string()
+            away_team: away_team.to_string(),
+            home_team: home_team.to_string(),
         });
         self.bets.insert(&SEASON.to_string(), &bets);
     }
@@ -212,8 +217,8 @@ impl NBABetsDate {
     }
 
     pub fn get_bets_by_account(&self, lookup_account: String) -> Vec<NBABet>{
-        self.get_all_bets().into_iter().filter(|x| x.better != None && (x.market_maker_id.to_string() == lookup_account || x.better.as_ref().unwrap().to_string() == lookup_account)).collect::<Vec<NBABet>>()
-        // self.get_all_bets().into_iter().filter(|x| (x.market_maker_id.to_string() == lookup_account || x.better.as_ref().unwrap().to_string() == lookup_account)).collect::<Vec<NBABet>>()
+        // self.get_all_bets().into_iter().filter(|x| x.better != None && (x.market_maker_id.to_string() == lookup_account || x.better.as_ref().unwrap().to_string() == lookup_account)).collect::<Vec<NBABet>>()
+        self.get_all_bets().into_iter().filter(|x| (x.market_maker_id.to_string() == lookup_account || x.better.as_ref().unwrap().to_string() == lookup_account)).collect::<Vec<NBABet>>()
     }
 
     pub fn get_open_bets_by_game_id(&self, game_id: String) -> Vec<NBABet>{

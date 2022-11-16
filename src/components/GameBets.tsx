@@ -4,13 +4,14 @@ import { providers, utils } from "near-api-js";
 import type { CodeResult } from "near-api-js/lib/providers/provider";
 import { CONTRACT_ID } from "../constants";
 import PrimaryButton from "./PrimaryButton";
+import { Bet } from "../interfaces";
 
 const BOATLOAD_OF_GAS = utils.format.parseNearAmount("0.00000000003")!;
 
 const GameBets = (gameData: {
-  homeTeam: string;
-  awayTeam: string;
-  gameId: string;
+  homeTeam?: string;
+  awayTeam?: string;
+  gameId?: string;
 }) => {
   const { selector, accountId } = useWalletSelector();
   const [bets, setBets] = useState([]);
@@ -69,7 +70,7 @@ const GameBets = (gameData: {
 
   return (
     <div className="grid-row-3 mx-auto mt-4 grid w-10/12 items-center justify-center">
-      {bets.map((bet: any, key: number) => (
+      {bets.map((bet: Bet, key: number) => (
         <div
           key={key}
           className="flex w-full flex-col items-center rounded bg-orange-200 py-2 px-4 text-slate-600"
