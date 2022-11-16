@@ -3,9 +3,15 @@ import { providers, utils } from "near-api-js";
 import type { AccountView } from "near-api-js/lib/providers/provider";
 import type { Account } from "../interfaces";
 import { useWalletSelector } from "../contexts/WalletSelectorContext";
-import { Popover, Transition } from "@headlessui/react";
-import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
+import { Popover, Transition, Menu } from "@headlessui/react";
+import {
+  Bars3Icon,
+  XMarkIcon,
+  ChevronDownIcon,
+} from "@heroicons/react/24/outline";
+import { GoSignIn, GoSignOut } from "react-icons/go";
 import { GiBasketballBall } from "react-icons/gi";
+import { HiOutlineSwitchHorizontal } from "react-icons/hi";
 import PrimaryButton from "./PrimaryButton";
 import Link from "next/link";
 
@@ -66,23 +72,22 @@ export default function Header() {
   return (
     <Popover className="relative border-b border-gray-600">
       <div className="mx-auto max-w-[100rem] px-4 sm:px-6">
-        <div className="flex items-center justify-between py-6 md:justify-start md:space-x-20">
+        <div className="flex items-center justify-between py-6 ">
           <div className="flex items-center justify-start lg:w-0 lg:flex-1">
-            <a href="#">
-              <span className="sr-only">Your Company</span>
+            <a className="flex" href="#">
               <GiBasketballBall className="h-8 w-auto text-orange-600 sm:h-10" />
+              <div className="ml-4 font-bold lg:text-4xl">Decentrahoops</div>
             </a>
-            <div className="ml-4 text-4xl font-bold">Decentrahoops</div>
           </div>
-          <div className="flex flex-row">
-            <Link href="/games" className="mx-4 hover:text-gray-500">
-              Games
+          <div className="flex flex-row items-start justify-start">
+            <Link href="/games" className="mx-2 hover:text-gray-500">
+              <PrimaryButton>Games</PrimaryButton>
             </Link>
-            <Link href="/open_bets" className="mx-4 hover:text-gray-500">
-              Open Bets
+            <Link href="/open_bets" className="mx-2 hover:text-gray-500">
+              <PrimaryButton>All Open Bets</PrimaryButton>
             </Link>
-            <Link href="/your_bets" className="mx-4 hover:text-gray-500">
-              Your Bets
+            <Link href="/your_bets" className="mx-2 hover:text-gray-500">
+              <PrimaryButton>Your Bets</PrimaryButton>
             </Link>
           </div>
           <div className="-my-2 -mr-2 md:hidden">
@@ -91,8 +96,101 @@ export default function Header() {
               <Bars3Icon className="h-6 w-6" aria-hidden="true" />
             </Popover.Button>
           </div>
+          <div className=" flex items-center">
+            {account ? (
+              <div className="mr-4">
+                Your Balance: {utils.format.formatNearAmount(account.amount, 2)}{" "}
+                N{" "}
+              </div>
+            ) : null}
+            {account ? (
+              <Menu
+                as="div"
+                className="relative inline-block items-center text-left"
+              >
+                <div>
+                  <Menu.Button className="inline-flex w-full justify-center rounded-md bg-black bg-opacity-20 px-4 py-2 text-sm font-medium text-white hover:bg-opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75">
+                    Wallet Options
+                    <ChevronDownIcon
+                      className="ml-2 -mr-1 h-5 w-5 text-violet-200 hover:text-violet-100"
+                      aria-hidden="true"
+                    />
+                  </Menu.Button>
+                </div>
+                <Transition
+                  as={Fragment}
+                  enter="transition ease-out duration-100"
+                  enterFrom="transform opacity-0 scale-95"
+                  enterTo="transform opacity-100 scale-100"
+                  leave="transition ease-in duration-75"
+                  leaveFrom="transform opacity-100 scale-100"
+                  leaveTo="transform opacity-0 scale-95"
+                >
+                  <Menu.Items className="absolute right-0 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                    <div className="px-1 py-1 ">
+                      <Menu.Item>
+                        {({ active }) => (
+                          <button
+                            className={`${
+                              active
+                                ? "bg-orange-500 text-white"
+                                : "text-gray-900"
+                            } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                            onClick={handleSwitchWallet}
+                          >
+                            {active ? (
+                              <HiOutlineSwitchHorizontal
+                                className="mr-2 h-5 w-5"
+                                aria-hidden="true"
+                              />
+                            ) : (
+                              <HiOutlineSwitchHorizontal
+                                className="mr-2 h-5 w-5"
+                                aria-hidden="true"
+                              />
+                            )}
+                            Switch Wallets
+                          </button>
+                        )}
+                      </Menu.Item>
+                      <Menu.Item>
+                        {({ active }) => (
+                          <button
+                            className={`${
+                              active
+                                ? "bg-orange-500 text-white"
+                                : "text-gray-900"
+                            } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                            onClick={handleSignOut}
+                          >
+                            {active ? (
+                              <GoSignOut
+                                className="mr-2 h-5 w-5"
+                                aria-hidden="true"
+                              />
+                            ) : (
+                              <GoSignOut
+                                className="mr-2 h-5 w-5"
+                                aria-hidden="true"
+                              />
+                            )}
+                            Disconnect Wallet
+                          </button>
+                        )}
+                      </Menu.Item>
+                    </div>
+                  </Menu.Items>
+                </Transition>
+              </Menu>
+            ) : (
+              <button className="flex" onClick={handleSignIn}>
+                {" "}
+                <GoSignIn className="mr-2 h-5 w-5" aria-hidden="true" /> Sign In{" "}
+              </button>
+            )}
+          </div>
 
-          <div className="hidden items-center justify-end md:flex md:flex-1 lg:w-0">
+          {/* <div className="hidden items-center justify-end md:flex md:flex-1 lg:w-0">
             {account ? (
               <div>
                 Your Balance: {utils.format.formatNearAmount(account.amount, 2)}{" "}
@@ -109,7 +207,7 @@ export default function Header() {
                 Connect Wallet
               </PrimaryButton>
             )}
-          </div>
+          </div> */}
         </div>
       </div>
 

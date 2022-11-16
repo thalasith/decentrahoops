@@ -59,8 +59,8 @@ const YourBets = () => {
     });
   }, []);
 
-  const acceptBet = useCallback(
-    async (betId: number, betterDeposit: string) => {
+  const cancelBet = useCallback(
+    async (betId: number) => {
       const wallet = await selector.wallet();
       return wallet
         .signAndSendTransaction({
@@ -70,10 +70,10 @@ const YourBets = () => {
             {
               type: "FunctionCall",
               params: {
-                methodName: "accept_bet_index",
+                methodName: "cancel_bet",
                 args: { id: betId },
                 gas: BOATLOAD_OF_GAS,
-                deposit: betterDeposit!,
+                deposit: "0",
               },
             },
           ],
@@ -161,10 +161,8 @@ const YourBets = () => {
                           " N"}
                       </span>
                     </p>
-                    <PrimaryButton
-                    //   onClick={() => acceptBet(bet.id, bet.better_deposit)}
-                    >
-                      Accept Bet
+                    <PrimaryButton onClick={() => cancelBet(bet.id)}>
+                      Cancel Bet
                     </PrimaryButton>
                   </div>
                 </div>

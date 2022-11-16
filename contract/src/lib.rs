@@ -122,8 +122,10 @@ impl NBABetsDate {
         Promise::new(bet.better.unwrap()).transfer(bet.better_deposit.0)
     }
 
+    // TODO: Ensure that only the market maker or depositor can call this function
     pub fn cancel_bet(&mut self, id:i64) {
         let bet = self.get_bet_by_id(id);
+
         assert!(bet.paid_out == false, "This bet as already been paid out.");
         assert!(bet.contract_locked == false, "The game is about to start. You cannot cancel this.");
         if bet.better_found == true  { 
