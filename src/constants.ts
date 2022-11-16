@@ -1,4 +1,4 @@
-export const CONTRACT_ID = "dev-1668544260554-26546481861135";
+export const CONTRACT_ID = "dev-1668613669510-73116263181325";
 
 export const WEEK_DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 

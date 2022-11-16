@@ -16,7 +16,7 @@ pub struct NBABet {
     better: Option<AccountId>,
     game_id: String,
     game_date: String,
-    start_time_utc: String,
+    start_time_utc: u64,
     market_maker_team: String,
     better_team: String,
     better_found: bool,
@@ -29,7 +29,7 @@ pub struct NBABet {
 }
 
 #[near_bindgen]
-#[derive(BorshDeserialize, BorshSerialize)]
+#[derive(BorshDeserialize, BorshSerialize, Debug)]
 pub struct NBABetsDate {
     season: String,
     bets: LookupMap<String, Vec<NBABet>>
@@ -53,12 +53,14 @@ impl NBABetsDate {
         }
     }
     #[payable]
-    pub fn create_bet(&mut self, better_amount:U128, game_id: String, game_date: String, market_maker_team: String, better_team: String, start_time_utc: String, away_team: String, home_team: String) {
+    pub fn create_bet(&mut self, better_amount:U128, game_id: String, game_date: String, market_maker_team: String, better_team: String, start_time_utc: u64, away_team: String, home_team: String) {
         assert!(NBA_TEAMS.contains(&market_maker_team.as_str()) == true, "Market maker team not found");
         assert!(NBA_TEAMS.contains(&better_team.as_str()) == true , "Better team not found");
         assert!(NBA_TEAMS.contains(&away_team.as_str()) == true , "Away team not found");
         assert!(NBA_TEAMS.contains(&home_team.as_str()) == true , "Home team not found");
-        
+        assert!(start_time_utc > env::block_timestamp_ms(), "Game has started - please find another game to bet on!");
+        assert!(start_time_utc - 7200000 > env::block_timestamp_ms(), "Game is about to start - no bets are able to be made.");
+
         let game_day = game_date.clone();
         let game_id = game_id.clone();
         let amount = env::attached_deposit();
@@ -75,7 +77,7 @@ impl NBABetsDate {
             better: None, 
             game_id: game_id, 
             game_date: game_day.to_string(), 
-            start_time_utc: start_time_utc.to_string(),
+            start_time_utc: start_time_utc,
             market_maker_team: market_maker_team.to_string(), 
             better_team: better_team.to_string(), 
             better_found: false, 
@@ -200,6 +202,23 @@ impl NBABetsDate {
         self.bets.insert(&SEASON.to_string(), &bets_by_day);
     }
 
+    pub fn get_time(&self) -> u64 {
+        env::block_timestamp_ms()
+    }
+    //
+    //Thu Nov 17 2022 03:00:00
+    //1668654000000 - start_time_utc
+    //1668614074809 - current block stamp
+    //Wed Nov 16 2022 15:54:34
+    // Assert that game has not started yet
+    
+    
+
+    // pub fn get_bet_time(&self, id: i64) -> u64 {
+    //     let bet = self.get_bet_by_id(id);
+    //     bet.start_time_utc
+    // }
+
     // View Methods
     pub fn get_all_bets(&self ) -> Vec<NBABet> {
         self.bets.get(&SEASON.to_string()).unwrap_or(vec![])
@@ -233,14 +252,35 @@ impl NBABetsDate {
 }
 
 
+/*
+ * the rest of this file sets up unit tests
+ * to run these, the command will be: `cargo test`
+ */
+
 #[cfg(test)]
 mod tests {
-    // use super::*;
-    // use near_sdk::{testing_env, VMContext};
+    use super::*;
+    // use near_sdk::{env};
+    // create near account
+    fn ntoy(near_amount: u128) -> U128 {
+        U128(near_amount * 10u128.pow(24))
+    }
 
-    // fn ntoy(near_amount: u128) -> U128 {
-    //     U128(near_amount * 10u128.pow(24))
-    // }
+    #[test]
+    fn create_contract() {
+        let contract: NBABetsDate = NBABetsDate::new();
+        assert_eq!(0, contract.get_all_bets().len());
 
+    }
+
+    #[test]
+    fn create_bet() {
+        let mut contract: NBABetsDate = NBABetsDate::new();
+        
+        contract.create_bet(ntoy(5).into(), "401468360".to_owned(), "20221114".to_owned(), "GS".to_owned(), "SA".to_string(), 1668481200000, "SA".to_owned(), "GS".to_owned());
+        assert_eq!(1, contract.get_all_bets().len());
+    }
+
+  
   
 }

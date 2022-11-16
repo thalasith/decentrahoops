@@ -15,6 +15,7 @@ const GameBets = (gameData: {
 }) => {
   const { selector, accountId } = useWalletSelector();
   const [bets, setBets] = useState([]);
+  console.log(bets);
 
   const getBets = useCallback(() => {
     const { network } = selector.options;

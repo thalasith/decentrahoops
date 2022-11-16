@@ -46,8 +46,6 @@ const GameBetModal = (modalData: {
     }
   };
 
-  console.log(marketMakerTeam);
-
   const makeBet = useCallback(
     async (
       odds: number,
@@ -65,7 +63,7 @@ const GameBetModal = (modalData: {
         market_maker_amount: parseNearAmount(makerAmount.toLocaleString()),
         market_maker_team: makerTeam,
         better_team: betTeam,
-        start_time_utc: modalData.gameDate,
+        start_time_utc: Date.parse(modalData.gameDate),
         away_team: modalData.awayTeam,
         home_team: modalData.homeTeam,
       };

@@ -26,7 +26,7 @@ export interface Bet {
   market_maker_id: string;
   market_maker_team: string;
   paid_out: boolean;
-  start_time_utc: string;
+  start_time_utc: number;
   winner: Nullable<string>;
   winning_team: Nullable<string>;
   away_team: string;
