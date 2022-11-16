@@ -2,7 +2,6 @@ import { type NextPage } from "next";
 import Head from "next/head";
 import Header from "../components/Header";
 import { WalletSelectorContextProvider } from "../contexts/WalletSelectorContext";
-import Content from "../components/Content";
 import YourBets from "../components/YourBets";
 
 const YourBetsPage: NextPage = () => {
