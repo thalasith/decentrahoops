@@ -75,7 +75,7 @@ export default function Header() {
         <div className="flex items-center justify-between py-6 ">
           <div className="flex items-center justify-start lg:w-0 lg:flex-1">
             <Link className="flex" href="/">
-              <GiBasketballBall className="h-8 w-auto text-orange-600 sm:h-10" />
+              <GiBasketballBall className="h-8 w-auto text-orange-400 sm:h-10" />
               <div className="ml-4 text-2xl font-bold lg:text-4xl">
                 Decentrahoops
               </div>

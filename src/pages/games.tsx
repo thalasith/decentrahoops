@@ -39,8 +39,6 @@ const Games: NextPage = () => {
     return week;
   };
 
-  console.log(midWeek(shownDay));
-
   const handleSetDay = async (date: Date) => {
     setShownDay(date);
   };

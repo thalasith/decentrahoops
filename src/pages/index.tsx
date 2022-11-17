@@ -2,8 +2,35 @@ import { type NextPage } from "next";
 import Head from "next/head";
 import Header from "../components/Header";
 import { WalletSelectorContextProvider } from "../contexts/WalletSelectorContext";
+import { useState } from "react";
+import { GiBasketballBall } from "react-icons/gi";
+import { HiArrowLeft, HiArrowRight } from "react-icons/hi";
+import { FiRefreshCw } from "react-icons/fi";
+import { AiFillLock } from "react-icons/ai";
+import Image from "next/image";
 
 const Home: NextPage = () => {
+  const [selectedTab, setSelectedTab] = useState(0);
+  const items = [
+    {
+      name: "Making a Bet",
+      link: "/games",
+      video: "https://www.youtube.com/embed/9Q1Z4ZQYQ8s",
+    },
+    {
+      name: "Browse Games",
+      link: "/games",
+      video: "https://www.youtube.com/embed/9Q1Z4ZQYQ8s",
+    },
+    {
+      name: "Cancel a Bet",
+      link: "/your_bets",
+      video: "https://www.youtube.com/embed/9Q1Z4ZQYQ8s",
+    },
+  ];
+  const handleItemsSelection = (index: number) => {
+    setSelectedTab(index);
+  };
   return (
     <>
       <Head>
@@ -14,8 +41,53 @@ const Home: NextPage = () => {
       <main className="bg-gray-800 text-white">
         <WalletSelectorContextProvider>
           <Header />
-          <div className="container mx-auto flex min-h-screen flex-col items-center justify-center p-4">
-            <h1>NEAR Guest Book</h1>
+          <div className="container mx-auto flex min-h-screen flex-row  p-4">
+            <div className="w-1/2">Hi there</div>
+            <div className="w-1/2">
+              <div className="flex h-96 w-full flex-col rounded-lg border border-gray-700 bg-zinc-700">
+                <div className="flex flex-row items-center pl-3 pt-1">
+                  <div className="flex flex-row pr-4">
+                    <span className="mr-1 inline-block h-3 w-3 rounded-full bg-gray-500"></span>
+                    <span className="mr-1 inline-block h-3 w-3 rounded-full bg-gray-500"></span>
+                    <span className="inline-block h-3 w-3 rounded-full bg-gray-500"></span>
+                  </div>
+                  <div className="flex w-full flex-row">
+                    {items.map((item, idx) => (
+                      <div
+                        key={idx}
+                        onClick={() => handleItemsSelection(idx)}
+                        className={`flex h-10 w-1/3 flex-row items-center rounded rounded-bl-none rounded-br-none text-sm  ${
+                          idx === selectedTab
+                            ? "bg-zinc-600 text-gray-300"
+                            : "bg-zinc-700 text-gray-400"
+                        } cursor-pointer py-1 px-2`}
+                      >
+                        <GiBasketballBall className="mr-1 h-4 w-4 text-orange-400" />
+                        {item.name}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="flex h-10 w-full flex-row items-center bg-zinc-600 py-2 text-gray-300">
+                  <HiArrowLeft className="ml-4" />
+                  <HiArrowRight className="mx-2" />
+                  <FiRefreshCw className="mr-4" />
+                  <div className="flex h-8 w-full flex-row items-center rounded-full rounded-tr-none rounded-br-none bg-zinc-700 text-sm text-gray-400">
+                    <AiFillLock className="mx-2" />
+                    <span>{`wwww.decentrahoops.com${items[selectedTab]?.link}`}</span>
+                  </div>
+                </div>
+                <div className="h-full rounded-b-lg">
+                  {" "}
+                  <iframe
+                    className="h-full w-full"
+                    title="Bet Example Video"
+                    src="/videos/bet_example.mp4"
+                    allow="autoplay"
+                  />
+                </div>
+              </div>
+            </div>
           </div>
         </WalletSelectorContextProvider>
       </main>

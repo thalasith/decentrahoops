@@ -38,12 +38,12 @@ const GameId: NextPage = () => {
         <WalletSelectorContextProvider>
           <Header />
           <div className="container mx-auto flex min-h-screen flex-col">
-            <PrimaryButton>
-              <Link href="/games" className="mx-auto my-4 w-full lg:w-10/12">
+            <Link href="/games" className="mx-auto my-4 lg:w-10/12">
+              <PrimaryButton>
                 <RiArrowGoBackFill className="my-1" />
                 Back to all Games
-              </Link>
-            </PrimaryButton>
+              </PrimaryButton>
+            </Link>
             {boxscore.isSuccess && (
               <div className="mx-auto flex w-10/12 flex-col items-center justify-center rounded bg-orange-200 text-slate-700">
                 <span> {boxscore?.data.status.type.detail}</span>
