@@ -27,17 +27,17 @@ const Home: NextPage = () => {
     {
       name: "Making a Bet",
       link: "/games",
-      video: "https://www.youtube.com/embed/9Q1Z4ZQYQ8s",
+      video: "videos/bet_example.mp4",
     },
     {
       name: "Browse Games",
       link: "/games",
-      video: "https://www.youtube.com/embed/9Q1Z4ZQYQ8s",
+      video: "videos/bet_example.mp4",
     },
     {
       name: "Cancel a Bet",
       link: "/your_bets",
-      video: "https://www.youtube.com/embed/9Q1Z4ZQYQ8s",
+      video: "videos/bet_example.mp4",
     },
   ];
   const handleItemsSelection = (index: number) => {
@@ -153,7 +153,7 @@ const Home: NextPage = () => {
                     height="100%"
                     width="100%"
                     title="Bet Example Video"
-                    url="videos/bet_example.mp4"
+                    url={items[selectedTab]?.video}
                     playing={true}
                     loop={true}
                     muted={true}
