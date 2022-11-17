@@ -97,6 +97,8 @@ impl NBABetsDate {
         let deposit = U128(env::attached_deposit()); 
 
         assert!(bet.better_deposit == deposit, "The attached deposit does not match the bets deposit!");
+        assert!(bet.start_time_utc > env::block_timestamp_ms(), "Game has started - you cannot accept this bet.");
+        assert!(bet.start_time_utc - 7200000 > env::block_timestamp_ms(), "Game is about to start - you cannot accept this bet.");
         bet.better = Some(env::signer_account_id());
         bet.better_found = true;
 

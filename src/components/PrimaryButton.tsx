@@ -5,7 +5,7 @@ interface ButtonProps {
   onClick?: () => void;
 }
 
-const HeaderButton: React.FC<ButtonProps> = ({ onClick, children }) => {
+const PrimaryButton: React.FC<ButtonProps> = ({ onClick, children }) => {
   return (
     <button
       onClick={onClick}
@@ -16,4 +16,4 @@ const HeaderButton: React.FC<ButtonProps> = ({ onClick, children }) => {
   );
 };
 
-export default HeaderButton;
+export default PrimaryButton;
