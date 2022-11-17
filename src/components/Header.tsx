@@ -70,7 +70,7 @@ export default function Header() {
   }, [accountId, getAccount]);
 
   return (
-    <Popover className="relative border-b border-gray-600">
+    <Popover className="relative z-10 border-b border-gray-600">
       <div className="mx-auto w-10/12  sm:px-6">
         <div className="flex items-center justify-between py-6 ">
           <div className="flex items-center justify-start lg:w-0 lg:flex-1">
@@ -129,7 +129,7 @@ export default function Header() {
                   leaveTo="transform opacity-0 scale-95"
                 >
                   <Menu.Items className="absolute right-0 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                    <div className="px-1 py-1 ">
+                    <div className="px-1 py-1">
                       <Menu.Item>
                         {({ active }) => (
                           <button

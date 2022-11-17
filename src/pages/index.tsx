@@ -10,7 +10,10 @@ import { FiRefreshCw } from "react-icons/fi";
 import { AiFillLock } from "react-icons/ai";
 import { useWindowWidth } from "@react-hook/window-size";
 import ReactPlayer from "react-player";
+import PrimaryButton from "../components/PrimaryButton";
+import SecondaryButton from "../components/SecondaryButton";
 import Image from "next/image";
+import Link from "next/link";
 
 const wait = (milliseconds: number) => {
   return new Promise((resolve) => setTimeout(resolve, milliseconds));
@@ -49,7 +52,6 @@ const Home: NextPage = () => {
   useEffect(() => {
     handleFade();
   }, []);
-  console.log(fade);
 
   return (
     <>
@@ -61,14 +63,14 @@ const Home: NextPage = () => {
       <main className="bg-gray-800 text-white">
         <WalletSelectorContextProvider>
           <Header />
-          <div className="mx-2 flex min-h-screen w-10/12 flex-col px-2 pt-12 lg:mx-auto lg:flex-row lg:px-8">
-            <div className="flex w-11/12 flex-row items-center justify-center lg:h-96 lg:w-1/2">
+          <div className="z-0 mx-2 flex min-h-screen w-10/12 flex-col px-2 pt-12 lg:mx-auto lg:flex-row lg:px-8">
+            <div className="flex w-11/12 flex-row items-center justify-center pl-8 lg:h-96 lg:w-1/2 lg:pl-0">
               <Transition
                 as="div"
                 show={fade}
-                enter="transform transition duration-1000"
-                enterFrom="opacity-0 -translate-x-6 blur"
-                enterTo="opacity-100 translate-x-0 blur-none"
+                enter="transform transition duration-1000 z-0"
+                enterFrom="opacity-0 -translate-x-6 blur z-0"
+                enterTo="opacity-100 translate-x-0 blur-none z-0"
                 leave="transform duration-200 transition ease-in-out"
                 leaveFrom="opacity-100 rotate-0 scale-100 "
                 leaveTo="opacity-0 scale-95 "
@@ -85,6 +87,14 @@ const Home: NextPage = () => {
                   Decentrahoops leverages blockchain technology to create a
                   decentralized sports betting platform.
                 </p>
+                <div className="flex flex-row ">
+                  <Link href="/games">
+                    <PrimaryButton>Start Betting Today</PrimaryButton>
+                  </Link>
+                  <Link href="/open_bets">
+                    <SecondaryButton>Browse Other Bets</SecondaryButton>
+                  </Link>
+                </div>
               </Transition>
             </div>
             <Transition
