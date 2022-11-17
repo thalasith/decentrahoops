@@ -45,6 +45,7 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-icons": "^4.6.0",
+    "react-player": "^2.11.0",
     "rxjs": "^7.5.7",
     "superjson": "1.9.1",
     "zod": "^3.18.0"

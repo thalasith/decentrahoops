@@ -9,6 +9,7 @@ import { HiArrowLeft, HiArrowRight } from "react-icons/hi";
 import { FiRefreshCw } from "react-icons/fi";
 import { AiFillLock } from "react-icons/ai";
 import { useWindowWidth } from "@react-hook/window-size";
+import ReactPlayer from "react-player";
 import Image from "next/image";
 
 const wait = (milliseconds: number) => {
@@ -65,7 +66,7 @@ const Home: NextPage = () => {
               <Transition
                 as="div"
                 show={fade}
-                enter="transform transition duration-700"
+                enter="transform transition duration-1000"
                 enterFrom="opacity-0 -translate-x-6 blur"
                 enterTo="opacity-100 translate-x-0 blur-none"
                 leave="transform duration-200 transition ease-in-out"
@@ -90,7 +91,7 @@ const Home: NextPage = () => {
               as="div"
               show={fade}
               className="w-[20rem] lg:w-1/2"
-              enter="transform transition duration-700"
+              enter="transform transition duration-1000"
               enterFrom="opacity-0 translate-x-6 blur"
               enterTo="opacity-100 translate-x-0 blur-none"
               leave="transform duration-200 transition ease-in-out"
@@ -138,11 +139,14 @@ const Home: NextPage = () => {
                 </div>
                 <div className="h-full rounded-b-lg">
                   {" "}
-                  <iframe
-                    className="h-full w-full"
+                  <ReactPlayer
+                    height="100%"
+                    width="100%"
                     title="Bet Example Video"
-                    src="/videos/bet_example.mp4"
-                    allow="autoplay"
+                    url="videos/bet_example.mp4"
+                    playing={true}
+                    loop={true}
+                    muted={true}
                   />
                 </div>
               </div>
