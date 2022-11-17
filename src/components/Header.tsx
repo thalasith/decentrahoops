@@ -71,7 +71,7 @@ export default function Header() {
 
   return (
     <Popover className="relative border-b border-gray-600">
-      <div className="mx-auto max-w-[100rem] px-4 sm:px-6">
+      <div className="mx-auto w-10/12  sm:px-6">
         <div className="flex items-center justify-between py-6 ">
           <div className="flex items-center justify-start lg:w-0 lg:flex-1">
             <Link className="flex" href="/">

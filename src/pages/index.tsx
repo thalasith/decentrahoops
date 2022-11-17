@@ -1,15 +1,23 @@
 import { type NextPage } from "next";
+import { useState, useEffect } from "react";
+import { Transition } from "@headlessui/react";
 import Head from "next/head";
 import Header from "../components/Header";
 import { WalletSelectorContextProvider } from "../contexts/WalletSelectorContext";
-import { useState } from "react";
 import { GiBasketballBall } from "react-icons/gi";
 import { HiArrowLeft, HiArrowRight } from "react-icons/hi";
 import { FiRefreshCw } from "react-icons/fi";
 import { AiFillLock } from "react-icons/ai";
+import { useWindowWidth } from "@react-hook/window-size";
 import Image from "next/image";
 
+const wait = (milliseconds: number) => {
+  return new Promise((resolve) => setTimeout(resolve, milliseconds));
+};
+
 const Home: NextPage = () => {
+  const screenWidth = useWindowWidth();
+
   const [selectedTab, setSelectedTab] = useState(0);
   const items = [
     {
@@ -31,6 +39,17 @@ const Home: NextPage = () => {
   const handleItemsSelection = (index: number) => {
     setSelectedTab(index);
   };
+  const [fade, setFade] = useState(false);
+
+  const handleFade = async () => {
+    await wait(2000);
+    setFade(true);
+  };
+  useEffect(() => {
+    handleFade();
+  }, []);
+  console.log(fade);
+
   return (
     <>
       <Head>
@@ -41,12 +60,46 @@ const Home: NextPage = () => {
       <main className="bg-gray-800 text-white">
         <WalletSelectorContextProvider>
           <Header />
-          <div className="container mx-auto flex min-h-screen flex-row  p-4">
-            <div className="w-1/2">Hi there</div>
-            <div className="w-1/2">
-              <div className="flex h-96 w-full flex-col rounded-lg border border-gray-700 bg-zinc-700">
-                <div className="flex flex-row items-center pl-3 pt-1">
-                  <div className="flex flex-row pr-4">
+          <div className="mx-2 flex min-h-screen w-10/12 flex-col px-2 pt-12 lg:mx-auto lg:flex-row lg:px-8">
+            <div className="flex w-11/12 flex-row items-center justify-center lg:h-96 lg:w-1/2">
+              <Transition
+                as="div"
+                show={fade}
+                enter="transform transition duration-700"
+                enterFrom="opacity-0 -translate-x-6 blur"
+                enterTo="opacity-100 translate-x-0 blur-none"
+                leave="transform duration-200 transition ease-in-out"
+                leaveFrom="opacity-100 rotate-0 scale-100 "
+                leaveTo="opacity-0 scale-95 "
+              >
+                <div className="text-4xl font-extrabold lg:text-6xl">
+                  Become your own{" "}
+                  <span className="text-orange-600"> sports book today</span>
+                </div>
+                <p className="pt-2 text-base text-gray-300 lg:text-2xl">
+                  Create your own odds, transparent fees, and no middleman.
+                </p>
+
+                <p className="text-base text-gray-300 lg:text-2xl">
+                  Decentrahoops leverages blockchain technology to create a
+                  decentralized sports betting platform.
+                </p>
+              </Transition>
+            </div>
+            <Transition
+              as="div"
+              show={fade}
+              className="w-[20rem] lg:w-1/2"
+              enter="transform transition duration-700"
+              enterFrom="opacity-0 translate-x-6 blur"
+              enterTo="opacity-100 translate-x-0 blur-none"
+              leave="transform duration-200 transition ease-in-out"
+              leaveFrom="opacity-100 rotate-0 scale-100 "
+              leaveTo="opacity-0 scale-95 "
+            >
+              <div className="mt-4 flex w-full flex-col rounded-lg border border-gray-700 bg-zinc-700 lg:mt-0 lg:h-96">
+                <div className="flex flex-row items-center pl-1 pt-1 lg:pl-3">
+                  <div className="flex flex-row pr-1 lg:pr-3">
                     <span className="mr-1 inline-block h-3 w-3 rounded-full bg-gray-500"></span>
                     <span className="mr-1 inline-block h-3 w-3 rounded-full bg-gray-500"></span>
                     <span className="inline-block h-3 w-3 rounded-full bg-gray-500"></span>
@@ -56,23 +109,29 @@ const Home: NextPage = () => {
                       <div
                         key={idx}
                         onClick={() => handleItemsSelection(idx)}
-                        className={`flex h-10 w-1/3 flex-row items-center rounded rounded-bl-none rounded-br-none text-sm  ${
+                        className={`flex h-10 w-1/3 flex-row items-center rounded rounded-bl-none rounded-br-none text-xs lg:text-sm  ${
                           idx === selectedTab
                             ? "bg-zinc-600 text-gray-300"
                             : "bg-zinc-700 text-gray-400"
                         } cursor-pointer py-1 px-2`}
                       >
                         <GiBasketballBall className="mr-1 h-4 w-4 text-orange-400" />
-                        {item.name}
+                        {item.name.length > 5 && screenWidth < 500
+                          ? item.name.slice(0, 5) + "..."
+                          : item.name}
                       </div>
                     ))}
                   </div>
                 </div>
                 <div className="flex h-10 w-full flex-row items-center bg-zinc-600 py-2 text-gray-300">
-                  <HiArrowLeft className="ml-4" />
-                  <HiArrowRight className="mx-2" />
-                  <FiRefreshCw className="mr-4" />
-                  <div className="flex h-8 w-full flex-row items-center rounded-full rounded-tr-none rounded-br-none bg-zinc-700 text-sm text-gray-400">
+                  <HiArrowLeft className="lg:ml-4" />
+                  <HiArrowRight className="mr-2 lg:mx-2" />
+                  <FiRefreshCw
+                    className={`lg:mr-4 ${
+                      screenWidth < 500 ? "hidden" : "inline-block"
+                    }`}
+                  />
+                  <div className="flex h-8 w-full flex-row items-center rounded-full rounded-tr-none rounded-br-none bg-zinc-700 text-xs text-gray-400 lg:text-sm">
                     <AiFillLock className="mx-2" />
                     <span>{`wwww.decentrahoops.com${items[selectedTab]?.link}`}</span>
                   </div>
@@ -87,12 +146,14 @@ const Home: NextPage = () => {
                   />
                 </div>
               </div>
-            </div>
+            </Transition>
           </div>
         </WalletSelectorContextProvider>
       </main>
     </>
   );
 };
+
+//{country.length > 21 ? country.slice(0, 21) + "..." : country}
 
 export default Home;
