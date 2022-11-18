@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 const SEASON:&str = "2022";
 
 
-const NBA_TEAMS: &'static [&'static str] = &["ATL", "BOS", "BKN", "CHA", "CHI", "CLE", "DAL", "DEN", "DET", "GS", "HOU", "IND", "LAC", "LAL", "MEM", "MIA", "MIL", "MIN", "NO", "NYK", "OKC", "ORL", "PHI", "PHX", "POR", "SAC", "SA", "TOR", "UTAH", "WAS"];
+const NBA_TEAMS: &'static [&'static str] = &["ATL", "BOS", "BKN", "CHA", "CHI", "CLE", "DAL", "DEN", "DET", "GS", "HOU", "IND", "LAC", "LAL", "MEM", "MIA", "MIL", "MIN", "NO", "NY", "OKC", "ORL", "PHI", "PHX", "POR", "SAC", "SA", "TOR", "UTAH", "WAS"];
 #[near_bindgen]
 #[derive(BorshDeserialize, BorshSerialize, Serialize, Deserialize, Clone, Debug)]
 pub struct NBABet {
@@ -131,6 +131,8 @@ impl NBABetsDate {
         let bet = self.get_bet_by_id(id);
 
         assert!(bet.paid_out == false, "This bet as already been paid out.");
+        assert!(bet.start_time_utc > env::block_timestamp_ms(), "Game has started - you cannot cancel this bet.");
+        assert!(bet.start_time_utc - 7200000 > env::block_timestamp_ms(), "Game is about to start - you cannot cancel this bet.");
         assert!(bet.contract_locked == false, "The game is about to start. You cannot cancel this.");
         if bet.better_found == true  { 
             assert!(bet.better.unwrap() == env::signer_account_id() || bet.market_maker_id == env::signer_account_id(), "You don't seem to be one of the betters.");
@@ -240,8 +242,8 @@ impl NBABetsDate {
     }
 
     pub fn get_bets_by_account(&self, lookup_account: String) -> Vec<NBABet>{
-        // self.get_all_bets().into_iter().filter(|x| x.better != None && (x.market_maker_id.to_string() == lookup_account || x.better.as_ref().unwrap().to_string() == lookup_account)).collect::<Vec<NBABet>>()
-        self.get_all_bets().into_iter().filter(|x| (x.market_maker_id.to_string() == lookup_account || x.better.as_ref().unwrap().to_string() == lookup_account)).collect::<Vec<NBABet>>()
+        self.get_all_bets().into_iter().filter(|x| x.better != None && (x.market_maker_id.to_string() == lookup_account || x.better.as_ref().unwrap().to_string() == lookup_account)).collect::<Vec<NBABet>>()
+        // self.get_all_bets().into_iter().filter(|x| (x.market_maker_id.to_string() == lookup_account || x.better.as_ref().unwrap().to_string() == lookup_account)).collect::<Vec<NBABet>>()
     }
 
     pub fn get_open_bets_by_game_id(&self, game_id: String) -> Vec<NBABet>{
@@ -281,6 +283,15 @@ mod tests {
         
         contract.create_bet(ntoy(5).into(), "401468360".to_owned(), "20221114".to_owned(), "GS".to_owned(), "SA".to_string(), 1668481200000, "SA".to_owned(), "GS".to_owned());
         assert_eq!(1, contract.get_all_bets().len());
+    }
+
+    #[test]
+    fn get_bet_by_id() {
+        let mut contract: NBABetsDate = NBABetsDate::new();
+        
+        contract.create_bet(ntoy(5).into(), "401468360".to_owned(), "20221114".to_owned(), "GS".to_owned(), "SA".to_string(), 1668481200000, "SA".to_owned(), "GS".to_owned());
+        contract.accept_bet_index(0);
+        println!("{:?}", contract.get_bet_by_id(0));
     }
 
   

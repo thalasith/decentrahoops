@@ -15,6 +15,8 @@ const capitalizeFirstLetter = (string: string) => {
 
 const YourBets = () => {
   const { selector, accountId } = useWalletSelector();
+  const [masterBets, setMasterBets] = useState<Bet[]>([]);
+  const [viewedBets, setViewedBets] = useState<Bet[]>([]);
 
   const [betsByCategory, setBetsByCategory] = useState({
     open: [],
@@ -59,8 +61,15 @@ const YourBets = () => {
     });
   }, []);
 
+  console.log("bets:", betsByCategory);
+
   const cancelBet = useCallback(
     async (betId: number) => {
+      // setBetsByCategory((prev) => ({
+      //   ...prev,
+      //   accepted: prev.accepted.filter((bet) => bet.id !== betId),
+      // }));
+
       const wallet = await selector.wallet();
       return wallet
         .signAndSendTransaction({
