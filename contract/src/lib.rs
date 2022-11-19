@@ -209,19 +209,6 @@ impl NBABetsDate {
     pub fn get_time(&self) -> u64 {
         env::block_timestamp_ms()
     }
-    //
-    //Thu Nov 17 2022 03:00:00
-    //1668654000000 - start_time_utc
-    //1668614074809 - current block stamp
-    //Wed Nov 16 2022 15:54:34
-    // Assert that game has not started yet
-    
-    
-
-    // pub fn get_bet_time(&self, id: i64) -> u64 {
-    //     let bet = self.get_bet_by_id(id);
-    //     bet.start_time_utc
-    // }
 
     // View Methods
     pub fn get_all_bets(&self ) -> Vec<NBABet> {

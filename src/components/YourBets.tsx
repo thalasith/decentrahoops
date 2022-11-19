@@ -6,6 +6,7 @@ import { CONTRACT_ID } from "../constants";
 import PrimaryButton from "./PrimaryButton";
 import { Tab } from "@headlessui/react";
 import { Bet } from "../interfaces";
+import { trpc } from "../utils/trpc";
 
 const BOATLOAD_OF_GAS = utils.format.parseNearAmount("0.00000000003")!;
 
@@ -21,7 +22,6 @@ const capitalizeFirstLetter = (string: string) => {
 
 const YourBets = () => {
   const { selector, accountId } = useWalletSelector();
-  const [shownBets, setShownBets] = useState<Bet[]>([]);
 
   const [betsByCategory, setBetsByCategory] = useState<BetsByCategory>({
     open: [],
@@ -101,6 +101,87 @@ const YourBets = () => {
   function classNames(...classes: string[]) {
     return classes.filter(Boolean).join(" ");
   }
+
+  const CancelBetButton = (betId: number) => {
+    return (
+      <PrimaryButton onClick={() => cancelBet(betId)}>Cancel Bet</PrimaryButton>
+    );
+  };
+
+  const claimBet = useCallback(
+    async (betId: number, winningTeam: string, statusNumber: number) => {
+      // TODO: CHECK THIS OUT IN CONSOLE LOGS TO MAKE SURE IT WORKS
+
+      const newCompleted = betsByCategory.completed;
+      newCompleted.find((bet) => bet.id === betId)!.paid_out = true;
+
+      setBetsByCategory((prev) => ({
+        ...prev,
+        completed: newCompleted,
+      }));
+
+      const args = {
+        id: betId,
+        winning_team: winningTeam,
+        status_number: statusNumber,
+      };
+
+      const wallet = await selector.wallet();
+      return wallet
+        .signAndSendTransaction({
+          signerId: accountId!,
+          receiverId: CONTRACT_ID,
+          actions: [
+            {
+              type: "FunctionCall",
+              params: {
+                methodName: "payout_bet",
+                args: args,
+                gas: BOATLOAD_OF_GAS,
+                deposit: "0",
+              },
+            },
+          ],
+        })
+        .catch((err) => {
+          alert(err);
+          console.log(err);
+          throw err;
+        });
+    },
+    [selector, accountId]
+  );
+
+  const ClaimWinningsButton = ({ betId, gameId, paidOut }: any) => {
+    const { data: game } = trpc.nbaGames.gameById.useQuery({
+      gameId: gameId,
+    });
+
+    const handleClaim = () => {
+      const gameStatus = parseInt(game.status.type.id);
+      const gameWinner =
+        game.competitors[0].winner === true
+          ? game.competitors[0].team.abbreviation
+          : game.competitors[1].team.abbreviation;
+      try {
+        if (gameStatus === 3) {
+          claimBet(betId, gameWinner, gameStatus);
+        } else {
+          throw "Game is not over yet.";
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    };
+
+    return paidOut ? (
+      <div>Paid Out Already!</div>
+    ) : (
+      <PrimaryButton onClick={() => handleClaim()}>
+        Claim Winnings
+      </PrimaryButton>
+    );
+  };
 
   return (
     <div className=" flex w-full flex-col items-center justify-start px-2 py-2 sm:px-0 ">
