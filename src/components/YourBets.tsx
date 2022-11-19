@@ -9,19 +9,23 @@ import { Bet } from "../interfaces";
 
 const BOATLOAD_OF_GAS = utils.format.parseNearAmount("0.00000000003")!;
 
+interface BetsByCategory {
+  open: Bet[];
+  accepted: Bet[];
+  completed: Bet[];
+}
+
 const capitalizeFirstLetter = (string: string) => {
   return string.charAt(0).toUpperCase() + string.slice(1);
 };
 
 const YourBets = () => {
   const { selector, accountId } = useWalletSelector();
-  const [masterBets, setMasterBets] = useState<Bet[]>([]);
-  const [viewedBets, setViewedBets] = useState<Bet[]>([]);
+  const [shownBets, setShownBets] = useState<Bet[]>([]);
 
-  const [betsByCategory, setBetsByCategory] = useState({
+  const [betsByCategory, setBetsByCategory] = useState<BetsByCategory>({
     open: [],
     accepted: [],
-
     completed: [],
   });
 
@@ -61,14 +65,12 @@ const YourBets = () => {
     });
   }, []);
 
-  console.log("bets:", betsByCategory);
-
   const cancelBet = useCallback(
     async (betId: number) => {
-      // setBetsByCategory((prev) => ({
-      //   ...prev,
-      //   accepted: prev.accepted.filter((bet) => bet.id !== betId),
-      // }));
+      setBetsByCategory((prev) => ({
+        ...prev,
+        accepted: prev.accepted.filter((bet) => bet.id !== betId),
+      }));
 
       const wallet = await selector.wallet();
       return wallet
