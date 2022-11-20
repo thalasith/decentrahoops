@@ -22,6 +22,7 @@ const capitalizeFirstLetter = (string: string) => {
 
 const YourBets = () => {
   const { selector, accountId } = useWalletSelector();
+  const [selected, setSelected] = useState("open");
 
   const [betsByCategory, setBetsByCategory] = useState<BetsByCategory>({
     open: [],
@@ -112,18 +113,20 @@ const YourBets = () => {
     async (betId: number, winningTeam: string, statusNumber: number) => {
       // TODO: CHECK THIS OUT IN CONSOLE LOGS TO MAKE SURE IT WORKS
 
-      const newCompleted = betsByCategory.completed;
-      newCompleted.find((bet) => bet.id === betId)!.paid_out = true;
+      // const newCompleted = betsByCategory.completed;
+      // console.log(betId);
+      // console.log(newCompleted.find((bet) => bet.id === 0));
+      // newCompleted.find((bet) => bet.id === betId)!.paid_out = true;
 
-      setBetsByCategory((prev) => ({
-        ...prev,
-        completed: newCompleted,
-      }));
+      // setBetsByCategory((prev) => ({
+      //   ...prev,
+      //   completed: newCompleted,
+      // }));
 
       const args = {
         id: betId,
         winning_team: winningTeam,
-        status_number: statusNumber,
+        status_num: statusNumber,
       };
 
       const wallet = await selector.wallet();
@@ -199,6 +202,7 @@ const YourBets = () => {
                     : "text-blue-100 hover:bg-white/[0.12] hover:text-white"
                 )
               }
+              onClick={() => setSelected(betCategory)}
             >
               {capitalizeFirstLetter(betCategory)}
             </Tab>
@@ -253,9 +257,14 @@ const YourBets = () => {
                           " N"}
                       </span>
                     </p>
-                    <PrimaryButton onClick={() => cancelBet(bet.id)}>
+                    {/* <PrimaryButton onClick={() => cancelBet(bet.id)}>
                       Cancel Bet
-                    </PrimaryButton>
+                    </PrimaryButton> */}
+                    <ClaimWinningsButton
+                      betId={bet.id}
+                      gameId={bet.game_id}
+                      paidOut={bet.paid_out}
+                    />
                   </div>
                 </div>
               ))}
