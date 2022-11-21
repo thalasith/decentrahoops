@@ -7,6 +7,7 @@ import PrimaryButton from "./PrimaryButton";
 import { Tab } from "@headlessui/react";
 import { Bet } from "../interfaces";
 import { trpc } from "../utils/trpc";
+import { ConnectableObservable } from "rxjs";
 
 const BOATLOAD_OF_GAS = utils.format.parseNearAmount("0.00000000003")!;
 
@@ -111,7 +112,7 @@ const YourBets = () => {
 
   const claimBet = useCallback(
     async (betId: number, winningTeam: string, statusNumber: number) => {
-      // TODO: CHECK THIS OUT IN CONSOLE LOGS TO MAKE SURE IT WORKS
+      // TODO: FIX FRONTEND PART
 
       // const newCompleted = betsByCategory.completed;
       // console.log(betId);
@@ -156,16 +157,16 @@ const YourBets = () => {
   );
 
   const ClaimWinningsButton = ({ betId, gameId, paidOut }: any) => {
-    const { data: game } = trpc.nbaGames.gameById.useQuery({
+    const gameData = trpc.nbaGames.gameById.useQuery({
       gameId: gameId,
     });
 
     const handleClaim = () => {
-      const gameStatus = parseInt(game.status.type.id);
+      const gameStatus = parseInt(gameData.data.status.type.id);
       const gameWinner =
-        game.competitors[0].winner === true
-          ? game.competitors[0].team.abbreviation
-          : game.competitors[1].team.abbreviation;
+        gameData.data.competitors[0].winner === true
+          ? gameData.data.competitors[0].team.abbreviation
+          : gameData.data.competitors[1].team.abbreviation;
       try {
         if (gameStatus === 3) {
           claimBet(betId, gameWinner, gameStatus);
@@ -177,12 +178,18 @@ const YourBets = () => {
       }
     };
 
-    return paidOut ? (
-      <div>Paid Out Already!</div>
+    return gameData.isSuccess ? (
+      gameData.data.status.type.id === "3" ? (
+        <PrimaryButton onClick={() => handleClaim()}>
+          Claim Winnings
+        </PrimaryButton>
+      ) : (
+        <PrimaryButton onClick={() => cancelBet(betId)}>
+          Cancel Bet
+        </PrimaryButton>
+      )
     ) : (
-      <PrimaryButton onClick={() => handleClaim()}>
-        Claim Winnings
-      </PrimaryButton>
+      <div>Loading...</div>
     );
   };
 
@@ -257,14 +264,20 @@ const YourBets = () => {
                           " N"}
                       </span>
                     </p>
-                    {/* <PrimaryButton onClick={() => cancelBet(bet.id)}>
-                      Cancel Bet
-                    </PrimaryButton> */}
-                    <ClaimWinningsButton
-                      betId={bet.id}
-                      gameId={bet.game_id}
-                      paidOut={bet.paid_out}
-                    />
+
+                    {selected === "accepted" && (
+                      <ClaimWinningsButton
+                        betId={bet.id}
+                        gameId={bet.game_id}
+                        paidOut={bet.paid_out}
+                      />
+                    )}
+                    {selected === "completed" &&
+                      (bet.winner === accountId ? (
+                        <div>You won!</div>
+                      ) : (
+                        <div>You lost!</div>
+                      ))}
                   </div>
                 </div>
               ))}

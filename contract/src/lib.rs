@@ -7,7 +7,7 @@ const SEASON:&str = "2022";
 
 const NBA_TEAMS: &'static [&'static str] = &["ATL", "BOS", "BKN", "CHA", "CHI", "CLE", "DAL", "DEN", "DET", "GS", "HOU", "IND", "LAC", "LAL", "MEM", "MIA", "MIL", "MIN", "NO", "NY", "OKC", "ORL", "PHI", "PHX", "POR", "SAC", "SA", "TOR", "UTAH", "WAS"];
 #[near_bindgen]
-#[derive(BorshDeserialize, BorshSerialize, Serialize, Deserialize, Clone, Debug)]
+#[derive(BorshDeserialize, BorshSerialize, Serialize, Deserialize, Clone, Debug,  Eq, Ord, PartialEq, PartialOrd)]
 pub struct NBABet {
     id: i64,
     market_maker_id: AccountId,
@@ -68,7 +68,8 @@ impl NBABetsDate {
         let mut bets = self.bets.get(&SEASON.to_string()).unwrap_or(vec![]);
 
         // QUESTION: This should create a unique ID each time right?
-        let id = bets.last().map(|b| b.id + 1).unwrap_or(0);
+        // let id = bets.last().map(|b| b.id + 1).unwrap_or(0);
+        let id = bets.iter().max_by_key(|b| b.id).map(|b| b.id + 1).unwrap_or(0);
         bets.push(NBABet { 
             id: id,
             market_maker_id: market_maker, 
