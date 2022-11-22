@@ -27,12 +27,12 @@ const Home: NextPage = () => {
     {
       name: "Making a Bet",
       link: "/games",
-      video: "videos/bet_example.mp4",
+      video: "videos/make_bet.mp4",
     },
     {
       name: "Browse Games",
       link: "/games",
-      video: "videos/bet_example.mp4",
+      video: "videos/browse_games.mp4",
     },
     {
       name: "Cancel a Bet",
