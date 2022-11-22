@@ -7,7 +7,6 @@ import PrimaryButton from "./PrimaryButton";
 import { Tab } from "@headlessui/react";
 import { Bet } from "../interfaces";
 import { trpc } from "../utils/trpc";
-import { ConnectableObservable } from "rxjs";
 
 const BOATLOAD_OF_GAS = utils.format.parseNearAmount("0.00000000003")!;
 
@@ -71,6 +70,7 @@ const YourBets = () => {
     async (betId: number) => {
       setBetsByCategory((prev) => ({
         ...prev,
+        open: prev.open.filter((bet) => bet.id !== betId),
         accepted: prev.accepted.filter((bet) => bet.id !== betId),
       }));
 
@@ -264,6 +264,12 @@ const YourBets = () => {
                           " N"}
                       </span>
                     </p>
+
+                    {selected === "open" && (
+                      <PrimaryButton onClick={() => cancelBet(bet.id)}>
+                        Cancel Bet
+                      </PrimaryButton>
+                    )}
 
                     {selected === "accepted" && (
                       <ClaimWinningsButton

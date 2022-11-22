@@ -230,8 +230,8 @@ impl NBABetsDate {
     }
 
     pub fn get_bets_by_account(&self, lookup_account: String) -> Vec<NBABet>{
-        self.get_all_bets().into_iter().filter(|x| x.better != None && (x.market_maker_id.to_string() == lookup_account || x.better.as_ref().unwrap().to_string() == lookup_account)).collect::<Vec<NBABet>>()
-        // self.get_all_bets().into_iter().filter(|x| (x.market_maker_id.to_string() == lookup_account || x.better.as_ref().unwrap().to_string() == lookup_account)).collect::<Vec<NBABet>>()
+        // self.get_all_bets().into_iter().filter(|x| x.better != None && (x.market_maker_id.to_string() == lookup_account || x.better.as_ref().unwrap().to_string() == lookup_account)).collect::<Vec<NBABet>>()
+        self.get_all_bets().into_iter().filter(|x| (x.market_maker_id.to_string() == lookup_account || x.better.as_ref().unwrap().to_string() == lookup_account)).collect::<Vec<NBABet>>()
     }
 
     pub fn get_open_bets_by_game_id(&self, game_id: String) -> Vec<NBABet>{

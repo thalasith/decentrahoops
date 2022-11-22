@@ -37,7 +37,7 @@ const Home: NextPage = () => {
     {
       name: "Cancel a Bet",
       link: "/your_bets",
-      video: "videos/bet_example.mp4",
+      video: "videos/cancel_bet.mp4",
     },
   ];
   const handleItemsSelection = (index: number) => {
