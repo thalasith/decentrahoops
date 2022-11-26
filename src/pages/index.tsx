@@ -1,8 +1,12 @@
 import { type NextPage } from "next";
-import { useState, useEffect } from "react";
+import dynamic from "next/dynamic";
+import { useState, useEffect, Suspense } from "react";
 import { Transition } from "@headlessui/react";
 import Head from "next/head";
-import Header from "../components/Header";
+// import Header from "../components/Header";
+const Header = dynamic(() => import("../components/Header"), {
+  suspense: true,
+});
 import { WalletSelectorContextProvider } from "../contexts/WalletSelectorContext";
 import { GiBasketballBall } from "react-icons/gi";
 import { HiArrowLeft, HiArrowRight } from "react-icons/hi";
@@ -61,7 +65,10 @@ const Home: NextPage = () => {
       </Head>
       <main className="bg-gray-800 text-white">
         <WalletSelectorContextProvider>
-          <Header />
+          <Suspense fallback={`Loading...`}>
+            <Header />
+          </Suspense>
+
           <div className="z-0 mx-2 flex min-h-screen w-10/12 flex-col px-2 pt-12 lg:mx-auto lg:flex-row lg:px-8">
             <div className="flex w-11/12 flex-row items-center justify-center pl-8 lg:h-96 lg:w-1/2 lg:pl-0">
               <Transition
@@ -78,15 +85,15 @@ const Home: NextPage = () => {
                   Become your own{" "}
                   <span className="text-orange-600"> sports book today</span>
                 </div>
-                <p className="pt-2 text-base text-gray-300 lg:text-2xl">
+                <p className="pt-6 text-base text-gray-300 lg:text-2xl">
                   Create your own odds, transparent fees, and no middleman.
                 </p>
 
-                <p className="text-base text-gray-300 lg:text-2xl">
+                <p className="pt-6 text-base text-gray-300 lg:text-2xl">
                   Decentrahoops leverages blockchain technology to create a
                   decentralized sports betting platform.
                 </p>
-                <div className="flex flex-row pt-4">
+                <div className="flex flex-row pt-6">
                   <Link href="/games">
                     <PrimaryButton>Start Betting Today</PrimaryButton>
                   </Link>
@@ -96,6 +103,7 @@ const Home: NextPage = () => {
                 </div>
               </Transition>
             </div>
+
             <Transition
               as="div"
               show={fade}

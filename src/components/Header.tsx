@@ -1,8 +1,8 @@
 import { Fragment, useCallback, useEffect, useState } from "react";
 import { providers, utils } from "near-api-js";
 import type { AccountView } from "near-api-js/lib/providers/provider";
-import type { Account } from "../interfaces";
 import { useWalletSelector } from "../contexts/WalletSelectorContext";
+import type { Account } from "../interfaces";
 import { Popover, Transition, Menu } from "@headlessui/react";
 import {
   Bars3Icon,

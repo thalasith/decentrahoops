@@ -31,6 +31,7 @@
     "@near-wallet-selector/sender": "^7.2.0",
     "@near-wallet-selector/wallet-connect": "^7.2.0",
     "@near-wallet-selector/welldone-wallet": "^7.2.0",
+    "@next/bundle-analyzer": "^13.0.5",
     "@prisma/client": "^4.5.0",
     "@react-hook/window-size": "^3.1.1",
     "@tanstack/react-query": "^4.10.0",
