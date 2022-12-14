@@ -3,10 +3,10 @@ import dynamic from "next/dynamic";
 import { useState, useEffect, Suspense } from "react";
 import { Transition } from "@headlessui/react";
 import Head from "next/head";
-// import Header from "../components/Header";
 const Header = dynamic(() => import("../components/Header"), {
   suspense: true,
 });
+
 import { WalletSelectorContextProvider } from "../contexts/WalletSelectorContext";
 import { GiBasketballBall } from "react-icons/gi";
 import { HiArrowLeft, HiArrowRight } from "react-icons/hi";
@@ -79,7 +79,7 @@ const Home: NextPage = () => {
                 enterTo="opacity-100 translate-y-0 blur-none z-0"
                 leave="transform duration-200 transition ease-in-out"
                 leaveFrom="opacity-100 rotate-0 scale-100 "
-                leaveTo="opacity-0 scale-95 "
+                leaveTo="opacity-0 scale-95"
               >
                 <div className="text-4xl font-extrabold lg:text-6xl">
                   Become your own{" "}
@@ -174,7 +174,5 @@ const Home: NextPage = () => {
     </>
   );
 };
-
-//{country.length > 21 ? country.slice(0, 21) + "..." : country}
 
 export default Home;
