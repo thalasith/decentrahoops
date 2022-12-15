@@ -1,8 +1,8 @@
 import { type NextPage } from "next";
-import dynamic from "next/dynamic";
 import { useState, useEffect, Suspense } from "react";
 import { Transition } from "@headlessui/react";
 import Head from "next/head";
+import dynamic from "next/dynamic";
 const Header = dynamic(() => import("../components/Header"), {
   suspense: true,
 });

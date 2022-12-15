@@ -1,6 +1,9 @@
 import { type NextPage } from "next";
 import Head from "next/head";
-import Header from "../components/Header";
+import dynamic from "next/dynamic";
+const Header = dynamic(() => import("../components/Header"), {
+  suspense: true,
+});
 import { WalletSelectorContextProvider } from "../contexts/WalletSelectorContext";
 import YourBets from "../components/YourBets";
 

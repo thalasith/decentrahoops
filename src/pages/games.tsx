@@ -6,7 +6,10 @@ import Head from "next/head";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
 import { WEEK_DAYS, MONTH_NAMES } from "../constants";
 import { dateStringEditor } from "../utils/formatting";
-import Header from "../components/Header";
+import dynamic from "next/dynamic";
+const Header = dynamic(() => import("../components/Header"), {
+  suspense: true,
+});
 import { WalletSelectorContextProvider } from "../contexts/WalletSelectorContext";
 
 const Games: NextPage = () => {
