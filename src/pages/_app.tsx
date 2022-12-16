@@ -16,7 +16,11 @@ const MyApp: AppType = ({ Component, pageProps }) => {
 
   return (
     <div className="min-h-screen bg-gray-800 text-white">
-      <Component {...pageProps} />
+      {isLoading ? (
+        <div className="flex h-full w-full items-center"> Loading... </div>
+      ) : (
+        <Component {...pageProps} />
+      )}
     </div>
   );
 };
