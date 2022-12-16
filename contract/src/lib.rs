@@ -279,6 +279,7 @@ mod tests {
         
         contract.create_bet(ntoy(5).into(), "401468360".to_owned(), "20221114".to_owned(), "GS".to_owned(), "SA".to_string(), 1668481200000, "SA".to_owned(), "GS".to_owned());
         contract.accept_bet_index(0);
+  
         println!("{:?}", contract.get_bet_by_id(0));
     }
 

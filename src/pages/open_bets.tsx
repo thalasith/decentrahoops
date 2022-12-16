@@ -15,7 +15,7 @@ const OpenBetsPage: NextPage = () => {
         <meta name="description" content="Decentrahoops" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className="bg-gray-800 text-white">
+      <main>
         <WalletSelectorContextProvider>
           <Header />
           <div className="container mx-auto flex min-h-screen flex-col items-center p-4">
